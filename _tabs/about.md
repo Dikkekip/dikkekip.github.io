@@ -4,8 +4,7 @@ icon: fas fa-info-circle
 order: 4
 ---
 
-# About Maarten Rosier
-## Cloud & DevOps Architect
+## Maarten Rosier - Cloud & DevOps Architect
 
 Hello and welcome to my blog, Adventures in Cloud and Code. My name is Maarten Rosier and I'm a Cloud & DevOps Architect with a passion for exploring the latest developments in Azure, Bicep, Infrastructure as Code, Entra ID, Intune, and Azure Virtual Desktop. I was born and raised in the beautiful coastal town of The Hague in the Netherlands. now embracing the frosty beauty of Norway. I’ve swapped our famous Dutch canals for fjords, all in pursuit of groundbreaking cloud migration projects and a closer connection with nature. I focus on Microsoft products and work in Oslo for Devoteam M Cloud.
 
