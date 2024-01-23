@@ -48,7 +48,7 @@ google_site_verification: at5n6ubfvaa6 # fill in to your verification string
 # The end of `jekyll-seo-tag` settings
 
 google_analytics:
-  id: G-5K0M5XGRBN
+  id: # G-5K0M5XGRBN
 
 # Prefer color scheme setting.
 #
@@ -71,7 +71,7 @@ theme_mode: dark
 img_cdn:
 
 # the avatar on sidebar, support local or CORS resources
-avatar: assets/img/Adventures-in-Cloud-and-Code.png
+avatar: assets/lib/Adventures-in-Cloud-and-Code.png
 
 # The URL of the site-wide social preview image used in SEO `og:image` meta tag.
 # It can be overridden by a customized `page.image` in front matter.
