@@ -43,7 +43,7 @@ Stay tuned, engage, and let's make tech topics not just informative, but a whole
 <!-- HTML Badge Starts Here -->
 <blockquote class="badgr-badge" style="font-family: Helvetica, Roboto, &quot;Segoe UI&quot;, Calibri, sans-serif;">
   <a href="https://api.eu.badgr.io/public/assertions/A_WXhpRiRtC_Bb8wFde6Tw?identity__email=maarten.rosier%40devoteam.com">
-    <img width="120px" height="120px" src="https://api.eu.badgr.io/public/assertions/A_WXhpRiRtC_Bb8wFde6Tw/image">
+    <img width="120px" height="120px" src="https://api.eu.badgr.io/public/assertions/A_WXhpRiRtC_Bb8wFde6Tw/image" alt="Devoteam Digital Champion">
   </a>
   <script async="async" src="https://eu.badgr.com/assets/widgets.bundle.js"></script>
 </blockquote>
