@@ -26,34 +26,49 @@ So, grab your favorite beverage, and let's get started on this exhilarating jour
 
 For this article, I've geared up my trusty CDX demo environment and conjured a new Entra ID tenant. We're starting from scratch, but with a twist of Cloud DevOps magic!
 
-### The Technical Grimoire 📜
+### The Technical Grimoire 📜: Conjuring Groups in the Cloud Realm
 Embarking on this journey, we're not just any wizards; we're PowerShell wizards! The documentation for PIM and GraphAPI can sometimes feel like a mysterious treasure map, where X doesn't always mark the spot. Fear not! I'm here to navigate these treacherous waters with you.
 
+🚪 Logging into the Graph APIs
 First things first, let's login to the Graph APIs. It's like opening the portal to our cloud kingdom. Ready your wands (or keyboards)!
 
-Lets get started and login to the Graph APIs
+Module Installation and Import: First, we ensure the Microsoft.Graph and Az.Accounts modules are installed and imported. These modules are like the twin engines powering our cloud management spaceship.
+
+
 ```powershell
-# Check if the Microsoft.Graph module is installed
+# Install and import Microsoft.Graph module
 if (-not (Get-Module -Name Microsoft.Graph -ListAvailable)) {
-    # Not installed? No problem! Let's install the MgGraph module.
     Install-Module -Name Microsoft.Graph -Scope CurrentUser -Force
 }
 
+
+# Install and import Az.Accounts module
+if (-not (Get-Module -Name Az.Accounts -ListAvailable)) {
+    Install-Module -Name Az.Accounts -Scope CurrentUser -Force
+}
+```
+Connect to Microsoft Graph: Next, we connect to the Microsoft Graph, specifying the necessary scopes. This step is like dialing into the heart of Azure AD.
+
+```powershell
+
 # Import the Microsoft.Graph module like a boss
-Import-Module Microsoft.Graph
+Import-Module Microsoft.Graph.Identity.Governance
 
 # Time to connect to Microsoft Graph with the right spells... I mean, scopes!
-Connect-MgGraph -Scopes "Group.ReadWrite.All", "User.Read.All"
+Connect-MgGraph -Scopes "Group.ReadWrite.All", "User.Read.All", "PrivilegedAccess.ReadWrite.AzureADGroup"
+
 
 # Let's summon all groups - you never know what lurks in there!
-Get-MgGroup
+$groups = Get-MgGroup
+
 
 ```
 
+🪄 Group Creation Spell
 Now that I'm authenticated using the PowerShell for Graph API modules, it's time to roll up our sleeves and dive into the mystical world of group creation. Microsoft has already provisioned a subset of groups for us, but hey, we're not ones to settle for the basics!
 
-Groups:
-![Introduction](./assets/img/pim-for-groups/PreProvisoionedgroups.png)
+PreProvisioned Groups:
+![PreProvisioned Groups](./assets/img/pim-for-groups/PreProvisoionedgroups.png)
 
 Now lets create some groups, naming standards may vary But I use the following
 { prefix }-{ system }-{ type }-{ region }-{ LzName }-{role}
@@ -66,15 +81,31 @@ For this demo I will create the following 3 groups
 With this part of the script we will create the groups and add the user we create the groups with as admin.
 
 ```Powershell
+
 $context = Get-MgContext
 $userPrincipalName = $context.Account 
 
 # Now you, dear reader, can define your own group names and descriptions!
 $groupsToCreate = Read-Host "Enter your group names and descriptions in the format 'name:description', separated by commas"
 $groupArray = $groupsToCreate -split "," | ForEach-Object { 
-    $split = $_ -split ":"
-    @{ name = $split[0].Trim(); description = $split[1].Trim() }
+    $split = $_ -split ":", 2  # Split only at the first occurrence of ":"
+    if ($split.Length -eq 2) {
+        [PSCustomObject]@{ name = $split[0].Trim(); description = $split[1].Trim() }
+    } else {
+        Write-Host "Invalid input format: $_"
+    }
 }
+
+<# 
+# Define the groups we want to create
+ $groupArray = @(
+   [PSCustomObject]@{ name = "d-avd-sec-weu-sandbox-lz-dikkekip-AdminAccess"; description = "AVD Admin Access Group" },
+   [PSCustomObject]@{ name = "d-jira-sec-weu-sandbox-lz-dikkekip-AdminAccess"; description = "JIRA Admin Access Group" },
+   [PSCustomObject]@{ name = "d-demo-sec-weu-sandbox-lz-dikkekip-AdminAccess"; description = "Demo Admin Access Group" }
+)
+#>
+
+$groupsCreated = @()
 
 foreach ($entry in $groupArray) {
     # Check if the groups already exist in your magical Entra ID realm
@@ -87,6 +118,7 @@ foreach ($entry in $groupArray) {
         } else {
             Write-Host "[$($user.UserPrincipalName)] Group [$($entry.name)][$($group.Id)] already exists. Skipping."
         }
+        $groupsCreated += $group
     } else {
         Write-Host "[$($user.UserPrincipalName)] Creating group [$($entry.name)]."
         # Time to create the group, with you as the owner. Why, you ask?
@@ -98,19 +130,65 @@ foreach ($entry in $groupArray) {
             SecurityEnabled     = $true
             "Owners@odata.bind" = @("https://graph.microsoft.com/v1.0/users/$userPrincipalName")
         }
-        New-MgGroup -BodyParameter $GroupBody
+        $newGroup = New-MgGroup -BodyParameter $GroupBody
+        $groupsCreated += $newGroup
     }
+}
+
+# Verify our magical creations
+Get-MgGroup -Filter "startsWith(displayName, 'd-')"
+
+```
+🧙‍♂️ And there you have it, fellow cloud wizard! With a few lines of PowerShell, we've summoned groups into existence in our cloud realm. Always remember, with great scripting power comes great responsibility (and a dash of fun!).
+
+Why do we add ourselves as the owner? In the world of Entra ID, being the owner of a group isn't just a title; it's a key to the kingdom. You need to be the owner to assign users as eligible members. Think of it as having the master key to the castle – without it, you can't really manage the inhabitants (users) of your Entra ID estate.
+
+### 🌩️ Enrolling Groups into Privileged Identity Management (PIM)
+
+Ah, the art of integrating groups into Privileged Identity Management! It's a bit of old-school wizardry, as the new Graph API spells haven't been updated for this specific ritual yet. But fear not, for we can still harness the power of the ancient APIs to achieve our goal. Here's how you can bring your newly created groups into the realm of PIM.
+
+#### ⚡ The Old API: A Classic Spell
+https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/groups-discover-groups
+
+```Powershell
+foreach ($group in $groupsCreated) {
+    # Let's add the group to the Privileged Identity Management (PIM)"
+    $accessTokenPim = (Get-AzAccessToken -ResourceUrl 'https://api.azrbac.mspim.azure.com').Token
+    $headers = @{
+        "Authorization" = "Bearer $accessTokenPim"
+        "Content-Type"  = "application/json"
+    }
+    $payload = @{
+        "externalId" = "8c1d0ae5-cb49-4aa4-acf4-a5b703e9cb7a"
+    }
+    
+    $url = "https://api.azrbac.mspim.azure.com/api/v2/privilegedAccess/aadGroups/resources/register" 
+    Write-Host "[$($user.UserPrincipalName)] Adding group [$($group.DisplayName)][$($group.Id)] to Privileged Identity Management | Groups."
+    Invoke-RestMethod -Uri $url -Headers $headers -Method Post -Body "{`"externalId`":`"$($group.id)`"}"
+    
 }
 ```
 
-Bring groups into Privileged Identity Management
-Discamer, I have to revert to the old api here, I can uforutnatly not find a methoth to do this with the Graph API :( if anyone can please let me know 
-The old 
-https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/groups-discover-groups
+#### 🧙‍♂️ Explaining the Spell
 
+1. **Token of Access**: We acquire the access token for PIM using `Get-AzAccessToken`. It's like the key to the castle's secret chamber.
 
+2. **Magical Headers**: We prepare our headers for the request, including the authorization token and content type. It's like setting the stage for a grand spell.
 
-Why do we add ourselves as the owner? In the world of Entra ID, being the owner of a group isn't just a title; it's a key to the kingdom. You need to be the owner to assign users as eligible members. Think of it as having the master key to the castle – without it, you can't really manage the inhabitants (users) of your Entra ID estate.
+3. **Payload Preparation**: Here, we define our payload, specifying the `externalId` as the ID of our group. Think of it as the main ingredient for our potion.
+
+4. **Casting the Spell**: With `Invoke-RestMethod`, we send our request to the PIM API. The group ID is attached, letting the PIM know which group to enroll in its mystical folds.
+
+5. **Witness the Magic**: Finally, we get a response back. If all goes well, our groups are now part of the Privileged Identity Management system, ready to uphold the sacred duties bestowed upon them.
+
+#### 📚 A Note on Documentation
+
+As you rightly pointed out, the Graph API currently lacks direct support for this operation. The method you've used is based on the older Privileged Identity Management iteration 2 API, as documented [here](https://learn.microsoft.com/en-us/graph/api/resources/privilegedidentitymanagement-root?view=graph-rest-beta). It's always a good idea to keep an eye on the latest updates, as the wizards at Microsoft might update their spells (APIs) with new capabilities.
+
+We are doing the following with the onboarding: [here](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/groups-discover-groups)
+
+Great, now the groups are onboarded, lets get some users as eligible members then! 🚀🔮
+
 
 This script gives you the flexibility to define your own group names and descriptions. It's like giving you the pen to write your own story in the Entra ID saga.
 
