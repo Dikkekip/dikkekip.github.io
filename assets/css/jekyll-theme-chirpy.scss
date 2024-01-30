@@ -8,6 +8,19 @@
     font-style: normal;
 }
 
+/* Universal Styling for Asciicast Containers */
+.asciicast {
+    font-family: 'JetBrainsMono Nerd Font', sans-serif; /* Example: Set font */
+    width: 100%; /* Full width */
+    margin: 20px auto; /* Centered with margin */
+}
+
+/* Universal Styling for Asciicast Iframes */
+iframe[src*="asciinema.org"] {
+    height: 1200px; /* Example: Set a fixed height */
+}
+
+
 code {
     font-family: 'JetBrainsMono Nerd Font', monospace;
 }
