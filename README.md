@@ -1,49 +1,51 @@
-# Chirpy Starter
+# README for Maarten Rosier's Blog
 
-[![Gem Version](https://img.shields.io/gem/v/jekyll-theme-chirpy)][gem]&nbsp;
-[![GitHub license](https://img.shields.io/github/license/cotes2020/chirpy-starter.svg?color=blue)][mit]
+Welcome to the GitHub repository managing my blog! Here, you'll find the behind-the-scenes magic that powers my tech-centric musings, PowerShell scripts, and cloud adventures.
 
-When installing the [**Chirpy**][chirpy] theme through [RubyGems.org][gem], Jekyll can only read files in the folders
-`_data`, `_layouts`, `_includes`, `_sass` and `assets`, as well as a small part of options of the `_config.yml` file
-from the theme's gem. If you have ever installed this theme gem, you can use the command
-`bundle info --path jekyll-theme-chirpy` to locate these files.
+## About the Blog
 
-The Jekyll team claims that this is to leave the ball in the user’s court, but this also results in users not being
-able to enjoy the out-of-the-box experience when using feature-rich themes.
+This is where I, Maarten Rosier, share my journey and experiences in the realm of Cloud and DevOps. From PowerShell scripting to deep dives into Microsoft technologies, my blog is a platform for both technical enthusiasts and professionals. It's also a place where I connect with the community and indulge in my passion for nerdy riddles and tech puzzles.
 
-To fully use all the features of **Chirpy**, you need to copy the other critical files from the theme's gem to your
-Jekyll site. The following is a list of targets:
+### What's Inside?
 
-```shell
+- **Blog Posts**: In-depth articles covering a range of topics from Azure Virtual Desktop to PowerShell intricacies.
+- **Scripts and Code Snippets**: Handy PowerShell scripts and other code pieces that I use in my day-to-day work.
+- **Community Interaction**: A space for discussions, sharing experiences, and collaborative learning.
+
+## How to Use This Repository
+
+- **Blog Content**: Find the Markdown files for my blog posts in the `posts` directory.
+- **Scripts**: The `scripts` directory contains PowerShell scripts and other code snippets featured in my blog.
+- **Resources**: Additional resources, such as images and reference documents, are stored in the `resources` directory.
+
+## Contributing
+
+I encourage community contributions! Whether it's fixing a bug in a script, suggesting improvements, or discussing topics, your input is valued.
+
+- **Issue Reporting**: Found a typo or a bug? Feel free to open an issue.
+- **Pull Requests**: Got an enhancement or a new script? PRs are welcome.
+
+## Stay Connected
+
+- **LinkedIn**: [Follow me on LinkedIn](https://www.linkedin.com/in/maartenrosier/) for updates and professional networking.
+- **Blog Comments**: Share your thoughts directly under each blog post.
+
+## Upcoming Blog Highlights
+
+🌟 Get a sneak peek at my upcoming posts:
+
+- **PIM for Groups**: Dive into the world of Privileged Identity Management with GraphAPI.
+- **Smart Admin Practices**: Learn how to smartly activate PIM as an admin.
+- **VM Admin Access via PIM Groups**: Explore admin privileges management for VMs using PIM groups.
+
+## Repository Structure
+
+```plaintext
 .
-├── _config.yml
-├── _plugins
-├── _tabs
-└── index.html
+├── posts/                  # Blog post contents
+├── scripts/                # PowerShell scripts and code snippets
+└── resources/              # Images and additional resources
 ```
-
-To save you time, and also in case you lose some files while copying, we extract those files/configurations of the
-latest version of the **Chirpy** theme and the [CD][CD] workflow to here, so that you can start writing in minutes.
-
-## Prerequisites
-
-Follow the instructions in the [Jekyll Docs](https://jekyllrb.com/docs/installation/) to complete the installation of
-the basic environment. [Git](https://git-scm.com/) also needs to be installed.
-
-## Installation
-
-Sign in to GitHub and [**use this template**][use-template] to generate a brand new repository and name it
-`USERNAME.github.io`, where `USERNAME` represents your GitHub username.
-
-Then clone it to your local machine and run:
-
-```console
-$ bundle
-```
-
-## Usage
-
-Please see the [theme's docs](https://github.com/cotes2020/jekyll-theme-chirpy#documentation).
 
 ## License
 
