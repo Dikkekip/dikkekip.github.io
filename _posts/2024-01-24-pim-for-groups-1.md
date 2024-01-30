@@ -105,7 +105,7 @@ With this part of the script, we will create the groups and add the user we crea
 For a live demonstration of the PowerShell script in action, check out the asciicast below:
 
 <div>
-    <script async id="asciicast-WdMHl5N12Vyc3ab0RArF3g0pw" src="https://asciinema.org/a/WdMHl5N12Vyc3ab0RArF3g0pw.js"></script>
+    <script async id="asciicast-WdMHl5N12Vyc3ab0RArF3g0pw" src="https://asciinema.org/a/WdMHl5N12Vyc3ab0RArF3g0pw.js"> async data-speed="2" data-theme="solarized-dark" data-autoplay="1" data-loop="1"></script>
 </div>
 
 ```Powershell
