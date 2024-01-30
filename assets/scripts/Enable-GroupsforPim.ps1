@@ -19,124 +19,158 @@ Connect-MgGraph -Scopes "Group.ReadWrite.All", "User.Read.All", "PrivilegedAcces
 
 # Let's summon all groups - you never know what lurks in there!
 $groups = Get-MgGroup
-
+# Preparing the environment for our Azure ritual
 $context = Get-MgContext
-$userPrincipalName = $context.Account 
+Write-Host "Context acquired. Current wizard in control: $($context.Account)"
 
-# Now you, dear reader, can define your own group names and descriptions!
-$CreateGroups = Read-Host "Do you want to create new groups? (y/n)"
+# Inquiring the wizard (you) about their intention to create new groups
+$CreateGroups = Read-Host "Do you wish to conjure new groups into existence? (y/n)"
 if ($CreateGroups -eq "y") {
+    Write-Host "Ah, a brave decision! Let's define the names and destinies of these new groups."
     $groupsToCreate = Read-Host "Enter your group names and descriptions in the format 'name:description', separated by commas"
     $groupArray = $groupsToCreate -split "," | ForEach-Object { 
-        $split = $_ -split ":", 2  # Split only at the first occurrence of ":"
+        $split = $_ -split ":", 2  # Splitting the input to extract name and description
         if ($split.Length -eq 2) {
+            Write-Host "Preparing to conjure group named $($split[0].Trim()) with a purpose of $($split[1].Trim())"
             [PSCustomObject]@{ name = $split[0].Trim(); description = $split[1].Trim() }
         }
         else {
-            Write-Host "Invalid input format: $_"
+            Write-Host "Beware! Invalid format detected for '$_'. A group name and description are required."
         }
-    }    
+    }
+    Write-Host "The list of groups to be conjured has been prepared."
 }
 
 $groupsCreated = @()
 
 foreach ($entry in $groupArray) {
-    # Check if the groups already exist in your magical Entra ID realm
+    # Consulting the Azure oracles to see if the group already exists
+    Write-Host "Consulting the Azure oracles for the existence of $($entry.name)..."
     $group = Get-MgGroup -Filter "DisplayName eq '$($entry.name)'"
     if ($group) {
-        # If the group exists but the description is off, let's update it.
+        Write-Host "The group $($entry.name) already exists in the realm of Azure."
+        # Updating the group's description if needed
         if ($entry.description -and $group.description -ne $entry.description) {
-            Write-Host "[$($context.Account)] Updating description for Group [$($entry.name)][$($group.Id)]"
+            Write-Host "Updating the lore (description) of $($entry.name) to match our records."
             Update-MgGroup -GroupId $group.Id -Description $entry.description
         }
         else {
-            Write-Host "[$($context.Account)] Group [$($entry.name)][$($group.Id)] already exists. Skipping."
+            Write-Host "No updates required for $($entry.name). Its lore remains unchanged."
         }
         $groupsCreated += $group
     }
     else {
-        Write-Host "[$($context.Account)] Creating group [$($entry.name)]."
-        # Time to create the group, with you as the owner. Why, you ask?
+        # The spell to create a new group
+        Write-Host "The group $($entry.name) is not yet part of our realm. Let's bring it to life!"
         $GroupBody = @{
             DisplayName         = $entry.name
             Description         = $entry.description
             MailEnabled         = $false
             MailNickname        = $entry.name
             SecurityEnabled     = $true
-            "Owners@odata.bind" = @("https://graph.microsoft.com/v1.0/users/$userPrincipalName")
+            "Owners@odata.bind" = @("https://graph.microsoft.com/v1.0/users/$($context.Account)")
         }
         $newGroup = New-MgGroup -BodyParameter $GroupBody
+        Write-Host "Group $($entry.name) has been successfully conjured!"
         $groupsCreated += $newGroup
     }
 }
 
-if (!$groupCreated) {
-    $groups = Get-MgGroup -all 
-    $groupsToEnable = $groups | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select the groups to activate" -OutputMode Multiple
+# Revealing our group crafting achievements
+Write-Host "Behold the groups that have been created or updated in this session:"
+foreach ($group in $groupsCreated) {
+    Write-Host "Group Name: $($group.DisplayName), ID: $($group.Id)"
+}
+
+# Starting the enchantment to enable Privileged Identity Management (PIM) for groups
+Write-Host "Initiating the process to enable PIM for Azure groups."
+
+# Deciding which groups to enable PIM for
+if (!$groupsCreated) {
+    Write-Host "No newly created groups detected. Retrieving all available groups for PIM activation."
+    $groups = Get-MgGroup -All
+    # Using a magical grid view to select groups
+    $groupsToEnable = $groups | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select groups to activate in PIM" -OutputMode Multiple
 }
 else {
+    Write-Host "Newly conjured groups detected. Preparing to enable PIM for these groups."
     $groupsToEnable = $groupsCreated
 }
 
-
-Write-Host "[$($context.Account)] Enabling Privileged Identity Management for the following groups:"
+# Displaying the groups chosen for PIM enablement
+Write-Host "Preparing to enable Privileged Identity Management for the following groups:"
 foreach ($group in $groupsToEnable) {
-    # If you want to find out more about the group, you can use the following command
+    Write-Host "Analyzing group: $($group.DisplayName) with ID: $($group.Id)"
+
+    # Checking the current status of the group in PIM
     $findGroupInPim = Get-MgIdentityGovernancePrivilegedAccessGroupAssignmentSchedule -Filter "groupId eq '$($group.Id)'"
     if (!$findGroupInPim) {
-        # Check if the user is connected
-        $context = Get-AzContext
+        Write-Host "Group $($group.DisplayName) is not yet part of PIM. Preparing to onboard."
 
+        # Ensure the user is connected to Azure
+        $context = Get-AzContext
         if ($null -eq $context) {
-            # If not connected, prompt the user to login
-            Write-Host "You are not connected. Please login."
+            Write-Host "Azure connection not detected. Requesting user to log in."
             Connect-AzAccount
         }
         else {
-            Write-Host "You are already connected as $($context.Account.Id)"
+            Write-Host "Already connected to Azure as $($context.Account.Id)"
         }
-        Write-Host "[$($context.Account)] [$($group.DisplayName)][$($group.Id)]"
-        # Let's add the group to the Privileged Identity Management (PIM)"
+
+        # Acquiring the token to communicate with the PIM API
         $accessTokenPim = (Get-AzAccessToken -ResourceUrl 'https://api.azrbac.mspim.azure.com').Token
         $headers = @{
             "Authorization" = "Bearer $accessTokenPim"
             "Content-Type"  = "application/json"
         }
+
+        # The URL to the PIM API for group registration
         $url = "https://api.azrbac.mspim.azure.com/api/v2/privilegedAccess/aadGroups/resources/register" 
-        Write-Host "[$($context.Account)] Adding group [$($group.DisplayName)][$($group.Id)] to Privileged Identity Management | Groups."
+
+        # Onboarding the group to PIM
+        Write-Host "Onboarding group '$($group.DisplayName)' (ID: $($group.Id)) to PIM."
         Invoke-RestMethod -Uri $url -Headers $headers -Method Post -Body "{`"externalId`":`"$($group.id)`"}"
-    }    
+        Write-Host "Group '$($group.DisplayName)' successfully onboarded to PIM."
+    }
+    else {
+        Write-Host "Group $($group.DisplayName) is already part of PIM. No action needed."
+    }
 }
 
+# Displaying the groups chosen for PIM enablement
 Write-Host "===================================================================================================="
-Write-Host "[$($context.Account)] All done! You can now assign users to the groups in Privileged Identity Management."
+Write-Host "[$($context.Account)] Final phase initiated: Assigning users to groups in Privileged Identity Management."
 
-# Let's assign the user to the group
-Write-Host "[$($context.Account)] Assigning users to the groups."
+# Initiating the process of assigning users to the selected groups
+Write-Host "[$($context.Account)] Commencing the user assignment to groups."
+
+# Determining the groups for user assignment
 if (!$groupsToEnable) {
-    Write-Host "[$($context.Account)] Select the groups to activate."
-    $groupsToConfigure = Get-MgGroup -all | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select the groups to activate" -OutputMode Multiple
+    Write-Host "[$($context.Account)] No groups specified for enabling. Retrieving all groups for user assignment selection."
+    $groupsToConfigure = Get-MgGroup -All | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select groups for user assignment" -OutputMode Multiple
 }
 else {
-    Write-Host "[$($context.Account)] Using the groups that were just created."
+    Write-Host "[$($context.Account)] Preparing to assign users to the recently enabled groups."
     $groupsToConfigure = $groupsToEnable
 }
 
-
-$usersToAssign = Get-MgUser -Filter "AccountEnabled eq true" | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select the users to assign" -OutputMode Multiple
-
-# If you want to find out more about the group, you can use the following command
-#Get-MgIdentityGovernancePrivilegedAccessGroupAssignmentSchedule -Filter "groupId eq '8c1d0ae5-cb49-4aa4-acf4-a5b703e9cb7a'"
+# Selecting the users to assign to the groups
+Write-Host "Selecting users to assign to the groups."
+$usersToAssign = Get-MgUser -Filter "AccountEnabled eq true" | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select users for assignment" -OutputMode Multiple
 
 foreach ($group in $groupsToConfigure) {
     foreach ($user in $usersToAssign) {
-        $isAssinged = Get-MgIdentityGovernancePrivilegedAccessGroupEligibilityScheduleRequest -Filter "groupId eq '$($group.Id)' and principalId eq '$($user.Id)'"
-        if (!$isAssinged) {
-            <# Action to perform if the condition is true #>
-            Write-Host "[$($context.Account)] Assigning user [$($user.DisplayName)][$($user.Id)] to group [$($group.DisplayName)][$($group.Id)]"
-            $startTime = Get-Date # the start time of the assignment, here it is set to now
-            $endTime = $startTime.AddMonths(12).AddDays(-1) # the end time of the assignment, here it is set to 12 months minus 1 day from the start time
+        # Checking if the user is already assigned to the group
+        Write-Host "Checking if user '$($user.DisplayName)' is already assigned to group '$($group.DisplayName)'."
+        $isAssigned = Get-MgIdentityGovernancePrivilegedAccessGroupEligibilityScheduleRequest -Filter "groupId eq '$($group.Id)' and principalId eq '$($user.Id)'"
+        
+        if (!$isAssigned) {
+            Write-Host "[$($context.Account)] Assigning user '$($user.DisplayName)' to group '$($group.DisplayName)'."
+            # Setting the assignment start and end times
+            $startTime = Get-Date # Assignment start time: now
+            $endTime = $startTime.AddMonths(12).AddDays(-1) # Assignment end time: 12 months minus 1 day from start
 
+            # Preparing parameters for the assignment
             $params = @{
                 accessId      = "member"
                 principalId   = "$($user.Id)"
@@ -152,10 +186,12 @@ foreach ($group in $groupsToConfigure) {
                 justification = "Entra ID - PIM Group Assignment - $($group.DisplayName) - $($user.DisplayName)"
             }
 
+            # Executing the assignment
             New-MgIdentityGovernancePrivilegedAccessGroupEligibilityScheduleRequest -BodyParameter $params
+            Write-Host "User '$($user.DisplayName)' successfully assigned to group '$($group.DisplayName)'."
         }
         else {
-            Write-Host "[$($context.Account)] User [$($user.DisplayName)][$($user.Id)] is already assigned to group [$($group.DisplayName)][$($group.Id)]"
+            Write-Host "[$($context.Account)] User '$($user.DisplayName)' is already a member of group '$($group.DisplayName)'. No action required."
         }
     }
 }
