@@ -16,14 +16,32 @@ else {
     Write-Host "✅ Az.Accounts module is already installed." -ForegroundColor Green
 }
 
+# Ensuring the presence of the Az.Accounts module
+if (-not (Get-Module -Name Microsoft.PowerShell.ConsoleGuiTools -ListAvailable)) {
+    Install-Module -Name Microsoft.PowerShell.ConsoleGuiTools -Scope CurrentUser -Force
+    Write-Host "🔮 Microsoft.PowerShell.ConsoleGuiTools module installed successfully!" -ForegroundColor Cyan
+}
+else {
+    Write-Host "✅ Microsoft.PowerShell.ConsoleGuiTools module is already installed." -ForegroundColor Green
+}
+
+
 # Import the Microsoft.Graph.Identity.Governance module
 Import-Module Microsoft.Graph.Identity.Governance
 Write-Host "📚 Imported Microsoft.Graph.Identity.Governance module." -ForegroundColor Magenta
 
 # Establishing a connection to Microsoft Graph
-# Think of this as tuning your crystal ball to the right magical frequency
-Connect-MgGraph -Scopes "Group.ReadWrite.All", "User.Read.All", "PrivilegedAccess.ReadWrite.AzureADGroup"
-Write-Host "🔗 Connected to Microsoft Graph with the necessary scopes." -ForegroundColor Blue
+$context = Get-MgContext
+
+if ($null -eq $context) {
+    Write-Host "Graph connection not detected. Requesting user to log in."
+    Connect-MgGraph -Scopes "Group.ReadWrite.All", "User.Read.All", "PrivilegedAccess.ReadWrite.AzureADGroup"
+    Write-Host "🧙‍♂️ Context acquired. Current wizard in control: $($context.Account)" -ForegroundColor Yellow
+    Write-Host "🔗 Connected to Microsoft Graph with the necessary scopes." -ForegroundColor Blue
+}
+else {
+    Write-Host "🧙‍♂️ Already connected to Graph as $($context.Account.Id)" -ForegroundColor Yellow
+}
 
 # Summoning all groups from the depths of Azure
 # Like casting a net into the sea of the cloud to see what mysteries we can uncover

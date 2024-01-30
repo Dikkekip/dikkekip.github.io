@@ -41,16 +41,34 @@ Before casting our spells, we need to prepare our magical ingredients. In the wi
 
 
 ```powershell
-# # Ensuring the presence of the Microsoft.Graph module
+# Ensuring the presence of the Microsoft.Graph module
 if (-not (Get-Module -Name Microsoft.Graph -ListAvailable)) {
     Install-Module -Name Microsoft.Graph -Scope CurrentUser -Force
+    Write-Host "🔮 Microsoft.Graph module installed successfully!" -ForegroundColor Cyan
 }
-
+else {
+    Write-Host "✅ Microsoft.Graph module is already installed." -ForegroundColor Green
+}
 
 # Ensuring the presence of the Az.Accounts module
 if (-not (Get-Module -Name Az.Accounts -ListAvailable)) {
     Install-Module -Name Az.Accounts -Scope CurrentUser -Force
+    Write-Host "🔮 Az.Accounts module installed successfully!" -ForegroundColor Cyan
 }
+else {
+    Write-Host "✅ Az.Accounts module is already installed." -ForegroundColor Green
+}
+
+# Ensuring the presence of the Az.Accounts module
+if (-not (Get-Module -Name Microsoft.PowerShell.ConsoleGuiTools -ListAvailable)) {
+    Install-Module -Name Microsoft.PowerShell.ConsoleGuiTools -Scope CurrentUser -Force
+    Write-Host "🔮 Microsoft.PowerShell.ConsoleGuiTools module installed successfully!" -ForegroundColor Cyan
+}
+else {
+    Write-Host "✅ Microsoft.PowerShell.ConsoleGuiTools module is already installed." -ForegroundColor Green
+}
+
+
 ```
 🧙‍♂️ Wizard's Tip:
 Always check for the existence of a module before trying to install it. This prevents unnecessary incantations and keeps your magic (and scripts) efficient!
@@ -105,9 +123,7 @@ For this demo, I will create the following 3 groups:
 
 With this part of the script, we will create the groups and add the user we create the groups with as owner so that we can manage Pim for groups.
 
-For a live demonstration of the PowerShell script in action, check out the asciicast below:
-
-<script async id="asciicast-WdMHl5N12Vyc3ab0RArF3g0pw" src="https://asciinema.org/a/WdMHl5N12Vyc3ab0RArF3g0pw.js" --font-dir="/assets/fonts" data-speed="1" data-theme="solarized-dark" data-autoplay="1" data-loop="1" --font-family="JetBrains Mono" --rows="20"></script>
+<script async id="asciicast-WdMHl5N12Vyc3ab0RArF3g0pw" src="https://asciinema.org/a/WdMHl5N12Vyc3ab0RArF3g0pw.js" font-dir="/assets/fonts" data-speed="1" data-theme="solarized-dark" data-autoplay="1" font-family="JetBrains Mono" --rows="20"></script>
 
 
 ```powershell
@@ -205,39 +221,39 @@ In the ever-evolving world of Azure, sometimes we must rely on the wisdom of the
 
 
 ```powershell
-# Starting the enchantment to enable Privileged Identity Management (PIM) for groups
-Write-Host "Initiating the process to enable PIM for Azure groups."
+Write-Host "🔮 Starting the enchantment to enable Privileged Identity Management (PIM) for groups" -ForegroundColor Cyan
 
 # Deciding which groups to enable PIM for
 if (!$groupsCreated) {
-    Write-Host "No newly created groups detected. Retrieving all available groups for PIM activation."
+    Write-Host "🔍 No newly created groups detected. Retrieving all available groups for PIM activation." -ForegroundColor Yellow
     $groups = Get-MgGroup -All
+
     # Using a magical grid view to select groups
     $groupsToEnable = $groups | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select groups to activate in PIM" -OutputMode Multiple
 }
 else {
-    Write-Host "Newly conjured groups detected. Preparing to enable PIM for these groups."
+    Write-Host "✨ Newly conjured groups detected. Preparing to enable PIM for these groups." -ForegroundColor Green
     $groupsToEnable = $groupsCreated
 }
 
 # Displaying the groups chosen for PIM enablement
-Write-Host "Preparing to enable Privileged Identity Management for the following groups:"
+Write-Host "📋 Preparing to enable Privileged Identity Management for the following groups:" -ForegroundColor Cyan
 foreach ($group in $groupsToEnable) {
-    Write-Host "Analyzing group: $($group.DisplayName) with ID: $($group.Id)"
+    Write-Host "🔎 Analyzing group: $($group.DisplayName) with ID: $($group.Id)" -ForegroundColor Magenta
 
     # Checking the current status of the group in PIM
     $findGroupInPim = Get-MgIdentityGovernancePrivilegedAccessGroupAssignmentSchedule -Filter "groupId eq '$($group.Id)'"
     if (!$findGroupInPim) {
-        Write-Host "Group $($group.DisplayName) is not yet part of PIM. Preparing to onboard."
+        Write-Host "⚡ Group $($group.DisplayName) is not yet part of PIM. Preparing to onboard." -ForegroundColor Yellow
 
         # Ensure the user is connected to Azure
         $context = Get-AzContext
         if ($null -eq $context) {
-            Write-Host "Azure connection not detected. Requesting user to log in."
+            Write-Host "❗ Azure connection not detected. Requesting user to log in." -ForegroundColor Red
             Connect-AzAccount
         }
         else {
-            Write-Host "Already connected to Azure as $($context.Account.Id)"
+            Write-Host "🔗 Already connected to Azure as $($context.Account.Id)" -ForegroundColor Green
         }
 
         # Acquiring the token to communicate with the PIM API
@@ -251,12 +267,12 @@ foreach ($group in $groupsToEnable) {
         $url = "https://api.azrbac.mspim.azure.com/api/v2/privilegedAccess/aadGroups/resources/register" 
 
         # Onboarding the group to PIM
-        Write-Host "Onboarding group '$($group.DisplayName)' (ID: $($group.Id)) to PIM."
+        Write-Host "🧙‍♂️ Onboarding group '$($group.DisplayName)' (ID: $($group.Id)) to PIM." -ForegroundColor Cyan
         Invoke-RestMethod -Uri $url -Headers $headers -Method Post -Body "{`"externalId`":`"$($group.id)`"}"
-        Write-Host "Group '$($group.DisplayName)' successfully onboarded to PIM."
+        Write-Host "✅ Group '$($group.DisplayName)' successfully onboarded to PIM." -ForegroundColor Green
     }
     else {
-        Write-Host "Group $($group.DisplayName) is already part of PIM. No action needed."
+        Write-Host "🚫 Group $($group.DisplayName) is already part of PIM. No action needed." -ForegroundColor Gray
     }
 }
 

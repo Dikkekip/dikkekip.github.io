@@ -105,39 +105,39 @@ foreach ($group in $groupsCreated) {
     Write-Host "📜 Group Name: $($group.DisplayName), ID: $($group.Id)" -ForegroundColor Green
 }
 
-# Starting the enchantment to enable Privileged Identity Management (PIM) for groups
-Write-Host "Initiating the process to enable PIM for Azure groups."
+Write-Host "🔮 Starting the enchantment to enable Privileged Identity Management (PIM) for groups" -ForegroundColor Cyan
 
 # Deciding which groups to enable PIM for
 if (!$groupsCreated) {
-    Write-Host "No newly created groups detected. Retrieving all available groups for PIM activation."
+    Write-Host "🔍 No newly created groups detected. Retrieving all available groups for PIM activation." -ForegroundColor Yellow
     $groups = Get-MgGroup -All
+
     # Using a magical grid view to select groups
     $groupsToEnable = $groups | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select groups to activate in PIM" -OutputMode Multiple
 }
 else {
-    Write-Host "Newly conjured groups detected. Preparing to enable PIM for these groups."
+    Write-Host "✨ Newly conjured groups detected. Preparing to enable PIM for these groups." -ForegroundColor Green
     $groupsToEnable = $groupsCreated
 }
 
 # Displaying the groups chosen for PIM enablement
-Write-Host "Preparing to enable Privileged Identity Management for the following groups:"
+Write-Host "📋 Preparing to enable Privileged Identity Management for the following groups:" -ForegroundColor Cyan
 foreach ($group in $groupsToEnable) {
-    Write-Host "Analyzing group: $($group.DisplayName) with ID: $($group.Id)"
+    Write-Host "🔎 Analyzing group: $($group.DisplayName) with ID: $($group.Id)" -ForegroundColor Magenta
 
     # Checking the current status of the group in PIM
     $findGroupInPim = Get-MgIdentityGovernancePrivilegedAccessGroupAssignmentSchedule -Filter "groupId eq '$($group.Id)'"
     if (!$findGroupInPim) {
-        Write-Host "Group $($group.DisplayName) is not yet part of PIM. Preparing to onboard."
+        Write-Host "⚡ Group $($group.DisplayName) is not yet part of PIM. Preparing to onboard." -ForegroundColor Yellow
 
         # Ensure the user is connected to Azure
         $context = Get-AzContext
         if ($null -eq $context) {
-            Write-Host "Azure connection not detected. Requesting user to log in."
+            Write-Host "❗ Azure connection not detected. Requesting user to log in." -ForegroundColor Red
             Connect-AzAccount
         }
         else {
-            Write-Host "Already connected to Azure as $($context.Account.Id)"
+            Write-Host "🔗 Already connected to Azure as $($context.Account.Id)" -ForegroundColor Green
         }
 
         # Acquiring the token to communicate with the PIM API
@@ -151,47 +151,47 @@ foreach ($group in $groupsToEnable) {
         $url = "https://api.azrbac.mspim.azure.com/api/v2/privilegedAccess/aadGroups/resources/register" 
 
         # Onboarding the group to PIM
-        Write-Host "Onboarding group '$($group.DisplayName)' (ID: $($group.Id)) to PIM."
+        Write-Host "🧙‍♂️ Onboarding group '$($group.DisplayName)' (ID: $($group.Id)) to PIM." -ForegroundColor Cyan
         Invoke-RestMethod -Uri $url -Headers $headers -Method Post -Body "{`"externalId`":`"$($group.id)`"}"
-        Write-Host "Group '$($group.DisplayName)' successfully onboarded to PIM."
+        Write-Host "✅ Group '$($group.DisplayName)' successfully onboarded to PIM." -ForegroundColor Green
     }
     else {
-        Write-Host "Group $($group.DisplayName) is already part of PIM. No action needed."
+        Write-Host "🚫 Group $($group.DisplayName) is already part of PIM. No action needed." -ForegroundColor Gray
     }
 }
 
 # Displaying the groups chosen for PIM enablement
 Write-Host "===================================================================================================="
-Write-Host "[$($context.Account)] Final phase initiated: Assigning users to groups in Privileged Identity Management."
+Write-Host "🔮 [$($context.Account)] Final phase initiated: Assigning users to groups in Privileged Identity Management." -ForegroundColor Cyan
 
 # Initiating the process of assigning users to the selected groups
-Write-Host "[$($context.Account)] Commencing the user assignment to groups."
+Write-Host "🚀 [$($context.Account)] Commencing the user assignment to groups." -ForegroundColor Magenta
 
 # Determining the groups for user assignment
 if (!$groupsToEnable) {
-    Write-Host "[$($context.Account)] No groups specified for enabling. Retrieving all groups for user assignment selection."
+    Write-Host "🤔 [$($context.Account)] No groups specified for enabling. Retrieving all groups for user assignment selection." -ForegroundColor Yellow
     $groupsToConfigure = Get-MgGroup -All | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select groups for user assignment" -OutputMode Multiple
 }
 else {
-    Write-Host "[$($context.Account)] Preparing to assign users to the recently enabled groups."
+    Write-Host "✨ [$($context.Account)] Preparing to assign users to the recently enabled groups." -ForegroundColor Green
     $groupsToConfigure = $groupsToEnable
 }
 
 # Selecting the users to assign to the groups
-Write-Host "Selecting users to assign to the groups."
+Write-Host "👥 Selecting users to assign to the groups." -ForegroundColor Cyan
 $usersToAssign = Get-MgUser -Filter "AccountEnabled eq true" | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select users for assignment" -OutputMode Multiple
 
 foreach ($group in $groupsToConfigure) {
     foreach ($user in $usersToAssign) {
         # Checking if the user is already assigned to the group
-        Write-Host "Checking if user '$($user.DisplayName)' is already assigned to group '$($group.DisplayName)'."
+        Write-Host "🔍 Checking if user '$($user.DisplayName)' is already assigned to group '$($group.DisplayName)'." -ForegroundColor Blue
         $isAssigned = Get-MgIdentityGovernancePrivilegedAccessGroupEligibilityScheduleRequest -Filter "groupId eq '$($group.Id)' and principalId eq '$($user.Id)'"
         
         if (!$isAssigned) {
-            Write-Host "[$($context.Account)] Assigning user '$($user.DisplayName)' to group '$($group.DisplayName)'."
+            Write-Host "👩‍🏫 [$($context.Account)] Assigning user '$($user.DisplayName)' to group '$($group.DisplayName)'." -ForegroundColor Cyan
             # Setting the assignment start and end times
-            $startTime = Get-Date # Assignment start time: now
-            $endTime = $startTime.AddMonths(12).AddDays(-1) # Assignment end time: 12 months minus 1 day from start
+            $startTime = Get-Date
+            $endTime = $startTime.AddMonths(12).AddDays(-1)
 
             # Preparing parameters for the assignment
             $params = @{
@@ -211,10 +211,10 @@ foreach ($group in $groupsToConfigure) {
 
             # Executing the assignment
             New-MgIdentityGovernancePrivilegedAccessGroupEligibilityScheduleRequest -BodyParameter $params
-            Write-Host "User '$($user.DisplayName)' successfully assigned to group '$($group.DisplayName)'."
+            Write-Host "✅ User '$($user.DisplayName)' successfully assigned to group '$($group.DisplayName)'." -ForegroundColor Green
         }
         else {
-            Write-Host "[$($context.Account)] User '$($user.DisplayName)' is already a member of group '$($group.DisplayName)'. No action required."
+            Write-Host "🔄 [$($context.Account)] User '$($user.DisplayName)' is already a member of group '$($group.DisplayName)'. No action required." -ForegroundColor Gray
         }
     }
 }
