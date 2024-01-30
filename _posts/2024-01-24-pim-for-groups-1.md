@@ -364,8 +364,4 @@ Drop your thoughts, insights, and magical incantations below. Let's make this bl
 
 *Maarten* 🍻💼🚀🧙‍♂️
 
-<div class="giscus-frame" style="margin-top: 24px">
-  <div class="giscus"></div>
-</div>
-
 ---
