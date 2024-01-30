@@ -186,6 +186,7 @@ foreach ($group in $groupsCreated) {
     Write-Host "📜 Group Name: $($group.DisplayName), ID: $($group.Id)" -ForegroundColor Green
 }
 ```
+
 🧙‍♂️ Voilà, esteemed cloud wizard! With mere lines of PowerShell incantation, you've called groups into being within our vast Azure kingdom. Remember, wielding the wand of scripting comes with considerable responsibility — but let's not forget the sprinkles of joy and intrigue it brings!
 
 🔑 Why anoint ourselves as the group's sovereign? In the Entra ID realm, owning a group transcends mere titular honor. It bestows upon you the master key to this digital dominion. As the owner, you're empowered to designate users as eligible members, akin to granting access to the inner sanctums of your castle. Without this key, the ability to effectively govern the denizens (users) of your Entra ID territory remains an elusive dream.
