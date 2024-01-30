@@ -123,7 +123,7 @@ For this demo, I will create the following 3 groups:
 
 With this part of the script, we will create the groups and add the user we create the groups with as owner so that we can manage Pim for groups.
 
-<script async id="asciicast-WdMHl5N12Vyc3ab0RArF3g0pw" src="https://asciinema.org/a/WdMHl5N12Vyc3ab0RArF3g0pw.js" font-dir="/assets/fonts" data-speed="1" data-theme="solarized-dark" data-autoplay="1" font-family="JetBrains Mono" --rows="20"></script>
+<script async id="asciicast-WdMHl5N12Vyc3ab0RArF3g0pw" src="https://asciinema.org/a/WdMHl5N12Vyc3ab0RArF3g0pw.js" font-dir="/assets/fonts" data-speed="1" data-theme="solarized-dark" data-autoplay="1" font-family="JetBrains Mono" rows="20"></script>
 
 
 ```powershell
@@ -219,6 +219,7 @@ Enabling PIM for groups is not just about control; it's about smart control. It 
 
 In the ever-evolving world of Azure, sometimes we must rely on the wisdom of the ancients. For onboarding groups into Privileged Identity Management (PIM), the new CMDLets are like elusive unicorns, yet to be discovered in our forests. So, we turn to the classic methods, as detailed in the [Microsoft Documentation](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/groups-discover-groups). It's akin to using an old, trusted map when the new GPS hasn't been updated for the latest roads.
 
+<script async id="asciicast-MwOuUPsNT5slmNFK11qzTSP1k" src="https://asciinema.org/a/MwOuUPsNT5slmNFK11qzTSP1k.js" font-dir="/assets/fonts" data-speed="1" data-theme="solarized-dark" data-autoplay="1" font-family="JetBrains Mono" rows="20"></script>
 
 ```powershell
 Write-Host "🔮 Starting the enchantment to enable Privileged Identity Management (PIM) for groups" -ForegroundColor Cyan
