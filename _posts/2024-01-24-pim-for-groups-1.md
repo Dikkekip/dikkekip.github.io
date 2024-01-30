@@ -6,6 +6,10 @@ comments: true
 description: "Discover the magic of automating PIM for groups with PowerShell and GraphAPI in Azure."
 categories: [Azure, PowerShell, Cloud Computing, DevOps, PIM, GraphAPI]
 tags: [Azure PIM, PowerShell Scripting, GraphAPI, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
+image:
+  path: /assets/img/pim-for-groups/thumbnail.png
+  src: /assets/img/pim-for-groups/thumbnail.png
+  alt: A visually striking and professional LinkedIn post thumbnail for a blog about automating Privileged Identity Management (PIM) for groups with PowerShell and GraphAPI in Azure. The image should feature elements like a magic wand, Azure logo, PowerShell icon, GraphAPI graphics, and digital networks, signifying the integration of magic, technology, and cloud computing. The image should have a modern, tech-savvy feel with a touch of whimsy, suitable for professional sharing.
 ---
 
 Hey tech enthusiasts! 👨‍💻🚀 Today, we're venturing into the mystical realm of Privileged Identity Management (PIM) iteration 3 APIs. Ever felt like deciphering PIM APIs is like unraveling ancient runes? Join the club! Today's quest involves the nuances of activating roles for groups eligible under PIM...
@@ -104,9 +108,9 @@ With this part of the script, we will create the groups and add the user we crea
 
 For a live demonstration of the PowerShell script in action, check out the asciicast below:
 
+{% raw %}
 <script async id="asciicast-WdMHl5N12Vyc3ab0RArF3g0pw" src="https://asciinema.org/a/WdMHl5N12Vyc3ab0RArF3g0pw.js" data-speed="2" data-theme="solarized-dark" data-autoplay="1" data-loop="1"></script>
-{: width="1200" height="800" }
-
+{% endraw %}
 
 
 ```powershell
@@ -360,8 +364,8 @@ Drop your thoughts, insights, and magical incantations below. Let's make this bl
 
 *Maarten* 🍻💼🚀🧙‍♂️
 
----
-
 <div class="giscus-frame" style="margin-top: 24px">
   <div class="giscus"></div>
 </div>
+
+---

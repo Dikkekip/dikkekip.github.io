@@ -1,12 +1,13 @@
 @import 'main';
 
-/* append your custom style below */
+/* Custom styles */
 @font-face {
     font-family: 'JetBrainsMono Nerd Font';
-    src: url('assets/css/JetBrainsMono-Regular.woff2') format('woff2');
+    src: url('/assets/fonts/JetBrainsMono-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
+
 code {
     font-family: 'JetBrainsMono Nerd Font', monospace;
 }
