@@ -104,11 +104,12 @@ With this part of the script, we will create the groups and add the user we crea
 
 For a live demonstration of the PowerShell script in action, check out the asciicast below:
 
-<div>
-    <script async id="asciicast-WdMHl5N12Vyc3ab0RArF3g0pw" src="https://asciinema.org/a/WdMHl5N12Vyc3ab0RArF3g0pw.js"> async data-speed="2" data-theme="solarized-dark" data-autoplay="1" data-loop="1"></script>
-</div>
+<script async id="asciicast-WdMHl5N12Vyc3ab0RArF3g0pw" src="https://asciinema.org/a/WdMHl5N12Vyc3ab0RArF3g0pw.js" data-speed="2" data-theme="solarized-dark" data-autoplay="1" data-loop="1"></script>
+{: width="1200" height="800" }
 
-```Powershell
+
+
+```powershell
 
 # Preparing the environment for our Azure ritual
 # Time to connect to Microsoft Graph with the right spells... I mean, scopes!
@@ -201,7 +202,7 @@ Enabling PIM for groups is not just about control; it's about smart control. It 
 In the ever-evolving world of Azure, sometimes we must rely on the wisdom of the ancients. For onboarding groups into Privileged Identity Management (PIM), the new CMDLets are like elusive unicorns, yet to be discovered in our forests. So, we turn to the classic methods, as detailed in the [Microsoft Documentation](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/groups-discover-groups). It's akin to using an old, trusted map when the new GPS hasn't been updated for the latest roads.
 
 
-```Powershell
+```powershell
 # Starting the enchantment to enable Privileged Identity Management (PIM) for groups
 Write-Host "Initiating the process to enable PIM for Azure groups."
 
@@ -359,3 +360,7 @@ Drop your thoughts, insights, and magical incantations below. Let's make this bl
 *Maarten* 🍻💼🚀🧙‍♂️
 
 ---
+
+<div class="giscus-frame" style="margin-top: 24px">
+  <div class="giscus"></div>
+</div>
