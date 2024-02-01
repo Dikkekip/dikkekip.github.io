@@ -152,12 +152,12 @@ small, .small {
 }
 
 .content x3d-canvas,
-.content iframe {
-  border: none;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-}
+//.content iframe {
+//  border: none;
+//  width: 100%;
+//  height: auto;
+ // aspect-ratio: 16 / 9;
+//}
 
 .content x3d-canvas.teaser {
   aspect-ratio: 16 / 5;
