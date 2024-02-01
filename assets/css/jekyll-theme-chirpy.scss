@@ -153,13 +153,12 @@ small, .small {
 
 .content x3d-canvas,
 
-.content iframe {
-  border: none;
-  width: 100%;
-  height: auto; /* Example height in rem */
-  aspect-ratio: 16 / 9;
-  font-family: 'JetBrainsMono Nerd Font', monospace;
-}
+//.content iframe {
+//  border: none;
+//  width: 100%;
+//  font-family: 'JetBrainsMono Nerd Font', monospace;
+//}
+
 .content x3d-canvas.teaser {
   aspect-ratio: 16 / 5;
 }

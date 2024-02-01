@@ -16,9 +16,10 @@ Hey tech enthusiasts! 👨‍💻🚀 Today, we're venturing into the mystical r
 
 1. **Privileged Identity Management APIs Overview**: [This article](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-apis#iteration-3-current--pim-for-microsoft-entra-roles-groups-in-microsoft-graph-api-and-for-azure-resources-in-arm-api) on Microsoft Learn provides a overview of PIM APIs. It is unfortunatly not great and I hope that this article does a better job at getting you started.
 
-> For those who prefer to run the script without delving into the blog, the full script is available [here](https://github.com/Dikkekip/dikkekip.github.io/blob/main/assets/scripts/Enable-GroupsforPim.ps1).{: .prompt-tip }
+> or those who prefer to run the script without delving into the blog, the full script is available [here](https://github.com/Dikkekip/dikkekip.github.io/blob/main/scripts/2024-01-24-pim-for-groups-1/Enable-GroupsforPim.ps1).
+{: .prompt-tip }
 
-2. **Why Use PIM for Groups?**: Let's decode the "why" behind the wizardry of PIM for Groups. Imagine you're the guardian of a mystical realm (your organization's IT environment). In this realm, power (access rights) must be bestowed carefully. PIM for Groups is like having a magical keyring that gives you control over who holds these powers and for how long.
+1. **Why Use PIM for Groups?**: Let's decode the "why" behind the wizardry of PIM for Groups. Imagine you're the guardian of a mystical realm (your organization's IT environment). In this realm, power (access rights) must be bestowed carefully. PIM for Groups is like having a magical keyring that gives you control over who holds these powers and for how long.
 
    - **Just-In-Time Access**: Think of it as a time-locked vault. You can grant access to certain resources, but only for a specific duration. This way, users have the privileges they need, exactly when they need them, reducing the risk of 'power' lingering in the wrong hands.
 
@@ -308,17 +309,39 @@ else {
 Write-Host "Selecting users to assign to the groups."
 $usersToAssign = Get-MgUser -Filter "AccountEnabled eq true" | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select users for assignment" -OutputMode Multiple
 
+
+# Displaying the groups chosen for PIM enablement
+Write-Host "===================================================================================================="
+Write-Host "🔮 [$($context.Account)] Final phase initiated: Assigning users to groups in Privileged Identity Management." -ForegroundColor Cyan
+
+# Initiating the process of assigning users to the selected groups
+Write-Host "🚀 [$($context.Account)] Commencing the user assignment to groups." -ForegroundColor Magenta
+
+# Determining the groups for user assignment
+if (!$groupsToEnable) {
+    Write-Host "🤔 [$($context.Account)] No groups specified for enabling. Retrieving all groups for user assignment selection." -ForegroundColor Yellow
+    $groupsToConfigure = Get-MgGroup -All | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select groups for user assignment" -OutputMode Multiple
+}
+else {
+    Write-Host "✨ [$($context.Account)] Preparing to assign users to the recently enabled groups." -ForegroundColor Green
+    $groupsToConfigure = $groupsToEnable
+}
+
+# Selecting the users to assign to the groups
+Write-Host "👥 Selecting users to assign to the groups." -ForegroundColor Cyan
+$usersToAssign = Get-MgUser -Filter "AccountEnabled eq true" | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select users for assignment" -OutputMode Multiple
+
 foreach ($group in $groupsToConfigure) {
     foreach ($user in $usersToAssign) {
         # Checking if the user is already assigned to the group
-        Write-Host "Checking if user '$($user.DisplayName)' is already assigned to group '$($group.DisplayName)'."
+        Write-Host "🔍 Checking if user '$($user.DisplayName)' is already assigned to group '$($group.DisplayName)'." -ForegroundColor Blue
         $isAssigned = Get-MgIdentityGovernancePrivilegedAccessGroupEligibilityScheduleRequest -Filter "groupId eq '$($group.Id)' and principalId eq '$($user.Id)'"
         
         if (!$isAssigned) {
-            Write-Host "[$($context.Account)] Assigning user '$($user.DisplayName)' to group '$($group.DisplayName)'."
+            Write-Host "👩‍🏫 [$($context.Account)] Assigning user '$($user.DisplayName)' to group '$($group.DisplayName)'." -ForegroundColor Cyan
             # Setting the assignment start and end times
-            $startTime = Get-Date # Assignment start time: now
-            $endTime = $startTime.AddMonths(12).AddDays(-1) # Assignment end time: 12 months minus 1 day from start
+            $startTime = Get-Date
+            $endTime = $startTime.AddMonths(12).AddDays(-1)
 
             # Preparing parameters for the assignment
             $params = @{
@@ -338,15 +361,41 @@ foreach ($group in $groupsToConfigure) {
 
             # Executing the assignment
             New-MgIdentityGovernancePrivilegedAccessGroupEligibilityScheduleRequest -BodyParameter $params
-            Write-Host "User '$($user.DisplayName)' successfully assigned to group '$($group.DisplayName)'."
+            Write-Host "✅ User '$($user.DisplayName)' successfully assigned to group '$($group.DisplayName)'." -ForegroundColor Green
         }
         else {
-            Write-Host "[$($context.Account)] User '$($user.DisplayName)' is already a member of group '$($group.DisplayName)'. No action required."
+            Write-Host "🔄 [$($context.Account)] User '$($user.DisplayName)' is already a member of group '$($group.DisplayName)'. No action required." -ForegroundColor Gray
         }
     }
 }
 
 ```
+
+## There You Have It: The Power of Eligible Assignments 🧙‍♂️
+
+And with that, we've successfully navigated the arcane waters of Azure PIM, empowering my user account with the Eligible assignments of the new groups. It's a digital alchemy of sorts, where each step brings us closer to mastering the art of cloud identity management.
+
+### 🧙‍♂️ The Magic of Group Membership Activation
+
+Now, as visible in the Azure portal, I can activate my membership to these groups. This simple yet powerful act is akin to unlocking a hidden door within the realm of Azure, granting me access to the groups' resources and capabilities.
+
+### 🔮 Next Article: Unveiling the Potential of Activated Access
+
+But wait, there's more! In the next article, we'll delve deeper into the practical applications of this setup. Imagine being able to dynamically manage access and privileges within your cloud environment — that's exactly where we're headed:
+
+- **Exploring the Activated Group Membership**: We'll take a hands-on look at how activated membership in these groups can be leveraged in real-world scenarios.
+- **Unlocking New Capabilities**: With our groups now at our command, we'll explore how this can translate into enhanced control over resources, including demo VMs in Azure.
+- **A Sneak Peek into Advanced Automations**: Get ready to witness how these group memberships can be utilized for even more sophisticated tasks and automations in Azure.
+
+# 🌌 Stay Tuned for the Next Spellbinding Chapter
+
+So, keep your wands at the ready and your minds open to the endless possibilities that Azure and PowerShell have to offer. Our journey into the depths of cloud computing is far from over. In fact, it’s just getting more exciting!
+
+Make sure to follow along and join me in the next installment of our Azure saga, where we continue to unravel the mysteries and harness the powers of the cloud.
+
+*Until next time, happy cloud conjuring!*
+
+*Cheers, Maarten* 🍻💻✨
 
 #### 📚 A Note on Documentation
 
@@ -360,46 +409,17 @@ In the realm of Azure PIM automation with PowerShell, documentation plays the ro
 
 4. **Further Reading and Resources**: For those who wish to dive deeper into the technicalities or prefer to run the script without delving into the blog, the full script is available [here](https://github.com/Dikkekip/dikkekip.github.io/blob/main/assets/scripts/Enable-GroupsforPim.ps1). Additionally, a treasure trove of information on API usage and examples can be found in Microsoft's documentation [here](https://learn.microsoft.com/en-us/graph/api/privilegedaccessgroup-post-assignmentschedulerequests?view=graph-rest-1.0&tabs=powershell).
 
----
 
-🌟 **Join the Conversation & Share Your Magic!**
+## Prompts
 
-Hey fellow cloud wizards and sorcerers of code! The journey through the arcane world of Azure PIM and PowerShell scripting is ever-evolving and full of surprises. But the true magic happens when we come together as a community to share insights, experiences, and, yes, even our missteps.
+> An example showing the `tip` type prompt.
+{: .prompt-tip }
 
-**I'd love to hear from you!** 📢
+> An example showing the `info` type prompt.
+{: .prompt-info }
 
-- **Your Experiences**: Have you tried implementing PIM for groups in your mystical IT realm? Share your tales of triumphs or the dragons (challenges) you've faced.
-- **Your Spells (Scripts)**: If you've conjured up your own scripts or have tips and tricks to enhance the ones discussed here, let the community know!
-- **Questions & Mysteries**: Stuck on a particularly tricky spell? Or have questions about the arcane arts of Azure and PowerShell? Drop your queries in the comments below.
-- **Suggestions for Future Adventures**: Is there a specific topic or challenge in the world of cloud computing you'd like to see explored in future posts? Your wish is my command!
+> An example showing the `warning` type prompt.
+{: .prompt-warning }
 
-Let's continue to learn from each other and grow our collective knowledge. After all, each comment, question, and shared experience adds a new page to our grand book of cloud wizardry.
-
-Drop your thoughts, insights, and magical incantations below. Let's make this blog not just a repository of knowledge, but a thriving community of Azure enthusiasts!
-
-## 🌠 The Next Magical Chapter: Writeback Groups and Just-In-Time Admin Access
-
-As we close the tome on today’s spellbinding journey through the realms of Azure PIM and PowerShell, let’s cast our eyes toward the horizon, where new enchantments await. Our next adventure will take us even deeper into the mystical world of cloud computing and automation.
-
-### 🚀 Elevating the Wizardry: Writeback Groups and JIT Access
-
-In our upcoming blog, we'll explore the potent combination of **Writeback Groups** and **Just-In-Time (JIT) Admin Access**. Imagine being able to dynamically manage group memberships and grant immediate admin access to Azure resources, like our demo VMs, with the snap of your fingers. This is not just a wizard’s dream but a soon-to-be reality!
-
-### 🧙‍♂️ What Wonders Await:
-
-- **Writeback Groups in Action**: Discover how we can automate group membership updates, reflecting changes in real-time across your cloud environment.
-- **JIT Admin Access**: Learn how to grant admin access on a need-to-basis, drastically enhancing security and efficiency.
-- **Practical Demonstrations**: Witness the power of these tools through hands-on examples, including granting JIT admin access to demo VMs in Azure.
-- **Enhanced Security and Compliance**: See how these techniques not only streamline management but also fortify your domain against potential threats and compliance issues.
-
-### 🌌 Stay Tuned:
-
-Prepare your wands (and keyboards) for this exciting sequel where magic meets practicality in the realm of Azure cloud management. Ensure you’re subscribed and following, so you don’t miss out on this next chapter of our cloud wizardry adventure. Your journey to becoming an Azure sorcerer is just getting started!
-
-Until then, keep experimenting, keep learning, and may your PowerShell scripts run error-free!
-
-*See you in the next chapter of our Azure saga!*
-
-*Cheers, Maarten* 🍻👨‍💻💫
-
----
+> An example showing the `danger` type prompt.
+{: .prompt-danger }
