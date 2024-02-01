@@ -14,8 +14,9 @@ image:
 Hey tech enthusiasts! 👨‍💻🚀 Today, we're venturing into the mystical realm of Privileged Identity Management (PIM) iteration 3 APIs. Ever felt like deciphering PIM APIs is like unraveling ancient runes? Join the club! Today's quest involves the nuances of activating roles for groups eligible under PIM...
 
 1. **Privileged Identity Management APIs Overview**: [This article](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-apis#iteration-3-current--pim-for-microsoft-entra-roles-groups-in-microsoft-graph-api-and-for-azure-resources-in-arm-api) on Microsoft Learn provides a overview of PIM APIs. It is unfortunatly not great and I hope that this article does a better job at getting you started.
- 
-For those who wish to dive deeper into the technicalities or prefer to run the script without delving into the blog, the full script is available [here](https://github.com/Dikkekip/dikkekip.github.io/blob/main/assets/scripts/Enable-GroupsforPim.ps1).
+
+> [!TIP]
+> For those who prefer to run the script without delving into the blog, the full script is available [here](https://github.com/Dikkekip/dikkekip.github.io/blob/main/assets/scripts/Enable-GroupsforPim.ps1).
 
 2. **Why Use PIM for Groups?**: Let's decode the "why" behind the wizardry of PIM for Groups. Imagine you're the guardian of a mystical realm (your organization's IT environment). In this realm, power (access rights) must be bestowed carefully. PIM for Groups is like having a magical keyring that gives you control over who holds these powers and for how long.
 
