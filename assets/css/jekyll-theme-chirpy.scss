@@ -6,44 +6,28 @@
 /* append your custom style below */
 
 @mixin x_ite-dark-scheme {
-  --system-red: rgb(255, 69, 58);
-  --system-yellow: rgb(255, 214, 10);
-  --system-blue: rgb(10, 132, 255);
-  --system-green: rgb(48, 209, 88);
-
-  --nav-border-color: rgba(158, 158, 158, 0.17);
-  --nav-active-page: rgb(168, 182, 206);
-
-  --h2-color: rgb(228, 228, 93);
-  --h3-color: rgb(185, 137, 79);
-  --h3-color-strong: rgb(232, 201, 133);
-  --h4-color: rgb(60, 107, 184);
-  --h4-color-strong: rgb(175, 206, 255);
-
-  --example-background-color: rgba(0, 0, 0, 0.471);
-  --button-background-color: black;
-
-  --playground-toolbar-color: rgba(38, 38, 38, 0.7);
-  --playground-editor-background: rgba(0, 0, 0, 0.2);
-}
-
-@mixin x_ite-light-scheme {
-  --system-red: rgb(255, 59, 48);
-  --system-yellow: rgb(255, 204, 0);
-  --system-blue: rgb(0, 122, 255);
-  --system-green: rgb(52, 199, 89);
-
-  --h2-color: rgb(189, 0, 106);
-  --h3-color: rgb(159, 103, 34);;
-  --h3-color-strong: rgb(173, 81, 0);
-  --h4-color: rgb(29, 80, 163);
-  --h4-color-strong: rgb(10, 80, 144);
-
-  --example-background-color: rgba(235, 235, 255, 0.644);
-  --button-background-color: white;
-
-  --playground-toolbar-color: rgba(237, 239, 240, 0.7);
-  --playground-editor-background: rgba(227, 229, 230, 0.7);
+  --system-red: rgb(0, 120, 215); /* Azure equivalent of red, more like a primary azure */
+  --system-yellow: rgb(75, 175, 220); /* Lighter azure for a yellow substitute */
+  --system-blue: rgb(0, 163, 224); /* Bright azure */
+  --system-green: rgb(72, 202, 228); /* Cyan, a greenish azure */
+  
+  /* Navigation Colors - adjusted for an azure theme */
+  --nav-border-color: rgba(100, 149, 237, 0.17); /* Cornflower blue, soft border */
+  --nav-active-page: rgb(100, 181, 246); /* Light azure */
+  
+  /* Heading Colors - transitioning to azure and cool tones */
+  --h2-color: rgb(0, 191, 255); /* Deep sky blue, vibrant for H2 */
+  --h3-color: rgb(70, 130, 180); /* Steel blue, cooler for H3 */
+  --h3-color-strong: rgb(135, 206, 250); /* Light sky blue, lighter for emphasis */
+  --h4-color: rgb(30, 144, 255); /* Dodger blue, strong for H4 */
+  --h4-color-strong: rgb(173, 216, 230); /* Light blue, soft for strong H4 */
+  
+  /* Background and Utility Colors - keeping with the azure and cool theme */
+  --example-background-color: rgba(225, 245, 254, 0.471); /* Very light azure, for backgrounds */
+  --button-background-color: rgb(0, 123, 255); /* Vivid azure for buttons */
+  
+  --playground-toolbar-color: rgba(70, 130, 180, 0.7); /* Steel blue, for toolbar */
+  --playground-editor-background: rgba(225, 245, 254, 0.2); /* Very light azure, for editor background */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -197,117 +181,139 @@ small, .small {
   }
 }
 
-/* example overlay */
 
-.example {
-  z-index: 2;
-  position: fixed;
-  bottom: 1rem;
-  right: 1rem;
-  background: var(--example-background-color);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid var(--nav-border-color);
-  box-shadow: 0px 0px 10px black;
-}
-
-.example p {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.example .toolbar {
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  background-color: var(--example-background-color);
-}
-
-.example .toolbar > * {
-   cursor: pointer;
-   padding: 0 3px;
-}
-
-.example .toolbar > .selected {
-   color: var(--h2-color);
-}
-
-.example .toolbar > .separator {
-   border-left: 1px solid var(--text-color);
-   margin: 0 0 0 5px;
-}
-
-.example .toolbar > .separator + .separator {
-  display: none;
-}
-
-.example .toolbar > .dot::before {
-   content: "·";
-   margin: 0 3px 0 4px;
-}
-
-.example .footer > * {
-  padding: 0 3px;
-}
-
-.example .footer > .dot::before {
-  content: "·";
-  margin: 0 3px 0 4px;
-}
-
-.example x3d-canvas {
-  display: block;
-  width: 50vw;
-  height: auto;
-  aspect-ratio: 16 / 9;
-}
-
-@media all and (max-width: 849px) {
-  .example x3d-canvas {
-    width: 80vw;
-  }
-}
-
-@media all and (max-width: 576px) {
-  .example {
-    left: 15px;
-    right: 15px;
-  }
-
-  .example x3d-canvas {
-    width: 100%;
-  }
-}
-
-.example .fa-circle-xmark {
-  position: absolute;
-  display: block;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  padding: 10px;
-  left: -20px;
-  top: -18px;
-  cursor: pointer;
-}
-
-.example .fa-circle-xmark::after {
-  content: " ";
-  z-index: -1;
-  position: relative;
-  display: block;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  left: 0px;
-  top: -16px;
-  background: var(--button-background-color);
-}
 /* Custom styles */
 @font-face {
     font-family: 'JetBrainsMono Nerd Font';
     src: url('/assets/fonts/JetBrainsMono-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
+}
+
+.highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
+.highlight {
+  color: #7FDBFF; /* Light Azure for text */
+  background-color: #011627; /* Deep Azure for background */
+}
+.highlight .gl {
+  color: #1F618D; /* Darker Azure */
+  background-color: #2E4053; /* Dark Grayish Azure */
+}
+.highlight .gp {
+  color: #85C1E9; /* Soft Azure */
+  font-weight: bold;
+}
+.highlight .c, .highlight .ch, .highlight .cd, .highlight .cm, .highlight .cpf, .highlight .c1, .highlight .cs {
+  color: #3498DB; /* Bright Azure */
+  font-style: italic;
+}
+.highlight .cp {
+  color: #48C9B0; /* Aqua */
+  font-weight: bold;
+}
+.highlight .err {
+  color: #ECF0F1; /* Very light gray for contrast */
+  background-color: #2980B9; /* Error in Azure */
+}
+.highlight .gr {
+  color: #A569BD; /* Soft Purple */
+  font-weight: bold;
+  font-style: italic;
+}
+.highlight .k, .highlight .kd, .highlight .kv {
+  color: #5499C7; /* Calm Blue */
+  font-weight: bold;
+}
+.highlight .o, .highlight .ow {
+  color: #45B39D; /* Sea Green */
+  font-weight: bold;
+}
+.highlight .p, .highlight .pi {
+  color: #5DADE2; /* Light Blue */
+}
+
+
+.highlight .gd {
+  color: #154360; /* Darker Blue for deleted code */
+}
+.highlight .gi {
+  color: #AED6F1; /* Lighter Blue for inserted code */
+}
+.highlight .ge {
+  font-style: italic;
+}
+.highlight .gs {
+  font-weight: bold;
+}
+.highlight .gt {
+  color: #1F618D; /* Darker Azure */
+  background-color: #2E4053; /* Dark Grayish Azure */
+}
+.highlight .kc, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .gh, .highlight .gu {
+  color: #3498DB; /* Bright Azure for control keywords */
+  font-weight: bold;
+}
+.highlight .kt {
+  color: #5DADE2; /* Light Blue for data types */
+  font-weight: bold;
+}
+.highlight .no, .highlight .nc, .highlight .nd, .highlight .nn, .highlight .bp, .highlight .ne, .highlight .nl, .highlight .nt {
+  color: #85C1E9; /* Soft Azure for namespace, class, decorator */
+  font-weight: bold;
+}
+.highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo, .highlight .mx {
+  color: #7FB3D5; /* Medium Azure for numbers */
+  font-weight: bold;
+}
+.highlight .ld {
+  color: #7FB3D5; /* Medium Azure for string delimiter */
+  font-weight: bold;
+}
+.highlight .ss {
+  color: #7FB3D5; /* Medium Azure for secondary strings */
+  font-weight: bold;
+}
+.highlight .s, .highlight .sb, .highlight .dl, .highlight .sd, .highlight .s2, .highlight .sh, .highlight .sx, .highlight .sr, .highlight .s1 {
+  color: #D6EAF8; /* Very Light Blue for strings */
+  font-weight: bold;
+}
+.highlight .sa {
+  color: #5499C7; /* Calm Blue for attribute */
+  font-weight: bold;
+}
+.highlight .se {
+  color: #48C9B0; /* Aqua for end tag */
+  font-weight: bold;
+}
+.highlight .sc {
+  color: #48C9B0; /* Aqua for character */
+  font-weight: bold;
+}
+.highlight .si {
+  color: #48C9B0; /* Aqua for interpolation */
+  font-weight: bold;
+}
+.highlight .nb {
+  font-weight: bold;
+}
+.highlight .ni {
+  color: #85C1E9; /* Soft Azure for special identifier */
+  font-weight: bold;
+}
+.highlight .w {
+  color: #AED6F1; /* Light Blue for whitespace */
+}
+.highlight .go {
+  color: #AED6F1; /* Light Blue for go directive */
+}
+.highlight .nf, .highlight .fm {
+  color: #3498DB; /* Bright Azure for function name/method call */
+}
+.highlight .py {
+  color: #3498DB; /* Bright Azure for Python */
+}
+.highlight .na, .highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi, .highlight .vm {
+  color: #5DADE2; /* Light Blue for variable, class name, etc. */
+  font-weight: bold;
 }
