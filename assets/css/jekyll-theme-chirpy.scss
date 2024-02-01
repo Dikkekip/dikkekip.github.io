@@ -16,6 +16,7 @@
   --nav-active-page: rgb(100, 181, 246); /* Light azure */
   
   /* Heading Colors - transitioning to azure and cool tones */
+  --h1-color: rgb(10, 72, 155); /* Deep sky blue, vibrant for H2 */
   --h2-color: rgb(0, 191, 255); /* Deep sky blue, vibrant for H2 */
   --h3-color: rgb(70, 130, 180); /* Steel blue, cooler for H3 */
   --h3-color-strong: rgb(135, 206, 250); /* Light sky blue, lighter for emphasis */
@@ -110,7 +111,7 @@
 }
 
 .content h1 {
-  color: var(--link-color);
+  color: var(--h1-color);
   font-weight: bold;
 }
 
@@ -207,6 +208,18 @@ small, .small {
     src: url('/assets/fonts/JetBrainsMono-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
+}
+
+code, kbd, pre, samp {
+  font-family: 'JetBrainsMono Nerd Font';
+  font-size: 1em;
+}
+
+.highlight pre {
+  margin-bottom: 0;
+  font-size: 1rem;
+  line-height: 1.4rem;
+  word-wrap: normal;
 }
 
 .highlight table td { padding: 5px; }
@@ -337,6 +350,6 @@ small, .small {
   color: #3498DB; /* Bright Azure for Python */
 }
 .highlight .na, .highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi, .highlight .vm {
-  color: #023047; /* Light Blue for variable, class name, etc. */
+  color: #01cfff; /* Light Blue for variable, class name, etc. */
   font-weight: bold;
 }
