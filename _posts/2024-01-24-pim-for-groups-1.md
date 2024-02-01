@@ -9,14 +9,14 @@ tags: [Azure PIM, PowerShell Scripting, GraphAPI, Cloud Security, Access Managem
 image:
   path: /assets/img/pim-for-groups/thumbnail.png
   src: /assets/img/pim-for-groups/thumbnail.png
+toc: true
 ---
 
 Hey tech enthusiasts! 👨‍💻🚀 Today, we're venturing into the mystical realm of Privileged Identity Management (PIM) iteration 3 APIs. Ever felt like deciphering PIM APIs is like unraveling ancient runes? Join the club! Today's quest involves the nuances of activating roles for groups eligible under PIM...
 
 1. **Privileged Identity Management APIs Overview**: [This article](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-apis#iteration-3-current--pim-for-microsoft-entra-roles-groups-in-microsoft-graph-api-and-for-azure-resources-in-arm-api) on Microsoft Learn provides a overview of PIM APIs. It is unfortunatly not great and I hope that this article does a better job at getting you started.
 
-> [!TIP]
-> For those who prefer to run the script without delving into the blog, the full script is available [here](https://github.com/Dikkekip/dikkekip.github.io/blob/main/assets/scripts/Enable-GroupsforPim.ps1).
+> For those who prefer to run the script without delving into the blog, the full script is available [here](https://github.com/Dikkekip/dikkekip.github.io/blob/main/assets/scripts/Enable-GroupsforPim.ps1).{: .prompt-tip }
 
 2. **Why Use PIM for Groups?**: Let's decode the "why" behind the wizardry of PIM for Groups. Imagine you're the guardian of a mystical realm (your organization's IT environment). In this realm, power (access rights) must be bestowed carefully. PIM for Groups is like having a magical keyring that gives you control over who holds these powers and for how long.
 
@@ -377,8 +377,29 @@ Let's continue to learn from each other and grow our collective knowledge. After
 
 Drop your thoughts, insights, and magical incantations below. Let's make this blog not just a repository of knowledge, but a thriving community of Azure enthusiasts!
 
-*Looking forward to reading your comments,*
+## 🌠 The Next Magical Chapter: Writeback Groups and Just-In-Time Admin Access
 
-*Maarten* 🍻💼🚀🧙‍♂️
+As we close the tome on today’s spellbinding journey through the realms of Azure PIM and PowerShell, let’s cast our eyes toward the horizon, where new enchantments await. Our next adventure will take us even deeper into the mystical world of cloud computing and automation.
+
+### 🚀 Elevating the Wizardry: Writeback Groups and JIT Access
+
+In our upcoming blog, we'll explore the potent combination of **Writeback Groups** and **Just-In-Time (JIT) Admin Access**. Imagine being able to dynamically manage group memberships and grant immediate admin access to Azure resources, like our demo VMs, with the snap of your fingers. This is not just a wizard’s dream but a soon-to-be reality!
+
+### 🧙‍♂️ What Wonders Await:
+
+- **Writeback Groups in Action**: Discover how we can automate group membership updates, reflecting changes in real-time across your cloud environment.
+- **JIT Admin Access**: Learn how to grant admin access on a need-to-basis, drastically enhancing security and efficiency.
+- **Practical Demonstrations**: Witness the power of these tools through hands-on examples, including granting JIT admin access to demo VMs in Azure.
+- **Enhanced Security and Compliance**: See how these techniques not only streamline management but also fortify your domain against potential threats and compliance issues.
+
+### 🌌 Stay Tuned:
+
+Prepare your wands (and keyboards) for this exciting sequel where magic meets practicality in the realm of Azure cloud management. Ensure you’re subscribed and following, so you don’t miss out on this next chapter of our cloud wizardry adventure. Your journey to becoming an Azure sorcerer is just getting started!
+
+Until then, keep experimenting, keep learning, and may your PowerShell scripts run error-free!
+
+*See you in the next chapter of our Azure saga!*
+
+*Cheers, Maarten* 🍻👨‍💻💫
 
 ---
