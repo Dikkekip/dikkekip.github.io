@@ -30,6 +30,25 @@
   --playground-editor-background: rgba(225, 245, 254, 0.2); /* Very light azure, for editor background */
 }
 
+@mixin x_ite-light-scheme {
+  --system-red: rgb(135, 206, 235); /* Light Azure for red */
+  --system-yellow: rgb(173, 216, 230); /* Pale Azure for yellow */
+  --system-blue: rgb(176, 224, 230); /* Powder Blue, softer azure */
+  --system-green: rgb(144, 195, 212); /* Sky Blue, greenish azure */
+
+  --h2-color: rgb(135, 206, 250); /* Light sky blue for H2 */
+  --h3-color: rgb(100, 149, 237); /* Cornflower blue for H3 */
+  --h3-color-strong: rgb(70, 130, 180); /* Steel blue for strong H3 */
+  --h4-color: rgb(173, 216, 230); /* Pale Azure for H4 */
+  --h4-color-strong: rgb(135, 206, 235); /* Light Azure for strong H4 */
+
+  --example-background-color: rgba(240, 248, 255, 0.644); /* Alice Blue, very light azure */
+  --button-background-color: rgb(176, 224, 230); /* Powder Blue for buttons */
+
+  --playground-toolbar-color: rgba(173, 216, 230, 0.7); /* Pale Azure for toolbar */
+  --playground-editor-background: rgba(240, 248, 255, 0.7); /* Alice Blue, light azure for editor */
+}
+
 @media (prefers-color-scheme: dark) {
   html:not([data-mode]), html[data-mode=dark] {
     @include x_ite-dark-scheme;
