@@ -217,7 +217,7 @@ small, .small {
 }
 .highlight .gl {
   color: #1F618D; /* Darker Azure */
-  background-color: #2E4053; /* Dark Grayish Azure */
+  background-color: #151515; /* Dark Grayish Azure */
 }
 .highlight .gp {
   color: #85C1E9; /* Soft Azure */
@@ -226,6 +226,10 @@ small, .small {
 .highlight .c, .highlight .ch, .highlight .cd, .highlight .cm, .highlight .cpf, .highlight .c1, .highlight .cs {
   color: #3498DB; /* Bright Azure */
   font-style: italic;
+}
+.highlight .n {
+  color: #2c7da0; /* Aqua */
+  font-weight: bold;
 }
 .highlight .cp {
   color: #48C9B0; /* Aqua */
@@ -333,6 +337,6 @@ small, .small {
   color: #3498DB; /* Bright Azure for Python */
 }
 .highlight .na, .highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi, .highlight .vm {
-  color: #5DADE2; /* Light Blue for variable, class name, etc. */
+  color: #023047; /* Light Blue for variable, class name, etc. */
   font-weight: bold;
 }
