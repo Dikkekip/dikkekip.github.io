@@ -16,7 +16,7 @@ Hey tech enthusiasts! 👨‍💻🚀 Today, we're venturing into the mystical r
 
 1. **Privileged Identity Management APIs Overview**: [This article](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-apis#iteration-3-current--pim-for-microsoft-entra-roles-groups-in-microsoft-graph-api-and-for-azure-resources-in-arm-api) on Microsoft Learn provides a overview of PIM APIs. It is unfortunatly not great and I hope that this article does a better job at getting you started.
 
-> or those who prefer to run the script without delving into the blog, the full script is available [here](https://github.com/Dikkekip/dikkekip.github.io/blob/main/scripts/2024-01-24-pim-for-groups-1/Enable-GroupsforPim.ps1).
+> For those who prefer to run the script without delving into the blog, the full script is available [here](https://github.com/Dikkekip/dikkekip.github.io/blob/main/scripts/2024-01-24-pim-for-groups-1/Enable-GroupsforPim.ps1).
 {: .prompt-tip }
 
 1. **Why Use PIM for Groups?**: Let's decode the "why" behind the wizardry of PIM for Groups. Imagine you're the guardian of a mystical realm (your organization's IT environment). In this realm, power (access rights) must be bestowed carefully. PIM for Groups is like having a magical keyring that gives you control over who holds these powers and for how long.
@@ -121,13 +121,13 @@ Now, we shall embark on the mystical process of group creation. Remember, naming
 Naming standards may vary But I use the following format:
 {prefix}-{system}-{type}-{region}-{LzName}-{role}
 
-For this demo, I will create the following 3 groups:
+For this demo, I will create the following 2 groups:
 - `d-avd-sec-weu-sandbox-lz-dikkekip-AdminAccess`
 - `d-demo-sec-weu-sandbox-lz-dikkekip-AdminAccess`
 
 With this part of the script, we will create the groups and add the user we create the groups with as owner so that we can manage Pim for groups.
 
-<script async id="asciicast-WdMHl5N12Vyc3ab0RArF3g0pw" src="https://asciinema.org/a/WdMHl5N12Vyc3ab0RArF3g0pw.js" data-speed="1" data-theme="solarized-dark" data-autoplay="1"></script>
+[![asciicast](https://asciinema.org/a/A4waLEk7q8qF3tppRRzcXjIyh.svg)](https://asciinema.org/a/A4waLEk7q8qF3tppRRzcXjIyh)
 
 
 ```powershell
@@ -408,18 +408,3 @@ In the realm of Azure PIM automation with PowerShell, documentation plays the ro
 3. **Flexibility and Customization**: Our script's charm lies in its flexibility, allowing you to define group names and descriptions that resonate with your narrative in the Entra ID saga. This level of customization ensures that the script can be tailored to various organizational needs and scenarios.
 
 4. **Further Reading and Resources**: For those who wish to dive deeper into the technicalities or prefer to run the script without delving into the blog, the full script is available [here](https://github.com/Dikkekip/dikkekip.github.io/blob/main/assets/scripts/Enable-GroupsforPim.ps1). Additionally, a treasure trove of information on API usage and examples can be found in Microsoft's documentation [here](https://learn.microsoft.com/en-us/graph/api/privilegedaccessgroup-post-assignmentschedulerequests?view=graph-rest-1.0&tabs=powershell).
-
-
-## Prompts
-
-> An example showing the `tip` type prompt.
-{: .prompt-tip }
-
-> An example showing the `info` type prompt.
-{: .prompt-info }
-
-> An example showing the `warning` type prompt.
-{: .prompt-warning }
-
-> An example showing the `danger` type prompt.
-{: .prompt-danger }
