@@ -222,7 +222,7 @@ Enabling PIM for groups is not just about control; it's about smart control. It 
 
 In the ever-evolving world of Azure, sometimes we must rely on the wisdom of the ancients. For onboarding groups into Privileged Identity Management (PIM), the new CMDLets are like elusive unicorns, yet to be discovered in our forests. So, we turn to the classic methods, as detailed in the [Microsoft Documentation](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/groups-discover-groups). It's akin to using an old, trusted map when the new GPS hasn't been updated for the latest roads.
 
-<script async id="asciicast-fMHXCMCK4rMzCiPXWV7RplDQL" src="https://asciinema.org/a/fMHXCMCK4rMzCiPXWV7RplDQL.js"data-speed="1" data-theme="solarized-dark" data-autoplay="1" data-loop="1"></script>
+<script async id="asciicast-fMHXCMCK4rMzCiPXWV7RplDQL" src="https://asciinema.org/a/fMHXCMCK4rMzCiPXWV7RplDQL.js" data-speed="1" data-theme="solarized-dark" data-autoplay="1" data-loop="1"></script>
 
 ```powershell
 
