@@ -6,6 +6,20 @@ Write-Host "🔮 [$($context.Account)] Final phase initiated: Assigning users to
 # Initiating the process of assigning users to the selected groups
 Write-Host "🚀 [$($context.Account)] Commencing the user assignment to groups." -ForegroundColor Magenta
 
+$context = Get-MgContext
+
+if ($null -eq $context) {
+    Write-Host "Graph connection not detected. Requesting user to log in."
+    Connect-MgGraph -Scopes "User.Read.All", "PrivilegedAccess.ReadWrite.AzureADGroup"
+    Write-Host "🧙‍♂️ Context acquired. Current wizard in control: $($context.Account)" -ForegroundColor Yellow
+
+}
+else {
+    Write-Host "🧙‍♂️ Already connected to Graph as $($context.Account.Id)" -ForegroundColor Yellow
+}
+
+# Deciding which groups to enable PIM for
+write-host "🔍 No newly created groups detected. Retrieving all available groups for PIM activation." -ForegroundColor Yellow
 # Determining the groups for user assignment
 if (!$groupsToEnable) {
     Write-Host "🤔 [$($context.Account)] No groups specified for enabling. Retrieving all groups for user assignment selection." -ForegroundColor Yellow

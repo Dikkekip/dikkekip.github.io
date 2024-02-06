@@ -126,8 +126,7 @@ For this demo, I will create the following 2 groups:
 - `d-demo-sec-weu-sandbox-lz-dikkekip-AdminAccess`
 
 With this part of the script, we will create the groups and add the user we create the groups with as owner so that we can manage Pim for groups.
-
-[![asciicast](https://asciinema.org/a/A4waLEk7q8qF3tppRRzcXjIyh.svg)](https://asciinema.org/a/A4waLEk7q8qF3tppRRzcXjIyh)
+<script async id="asciicast-A4waLEk7q8qF3tppRRzcXjIyh" src="https://asciinema.org/a/A4waLEk7q8qF3tppRRzcXjIyh.js" data-speed="1" data-theme="solarized-dark" data-autoplay="1" data-loop="1"></script>
 
 
 ```powershell
@@ -223,10 +222,23 @@ Enabling PIM for groups is not just about control; it's about smart control. It 
 
 In the ever-evolving world of Azure, sometimes we must rely on the wisdom of the ancients. For onboarding groups into Privileged Identity Management (PIM), the new CMDLets are like elusive unicorns, yet to be discovered in our forests. So, we turn to the classic methods, as detailed in the [Microsoft Documentation](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/groups-discover-groups). It's akin to using an old, trusted map when the new GPS hasn't been updated for the latest roads.
 
-<script async id="asciicast-MwOuUPsNT5slmNFK11qzTSP1k" src="https://asciinema.org/a/MwOuUPsNT5slmNFK11qzTSP1k.js" data-speed="1" data-theme="solarized-dark" data-autoplay="1"></script>
+<script async id="asciicast-fMHXCMCK4rMzCiPXWV7RplDQL" src="https://asciinema.org/a/fMHXCMCK4rMzCiPXWV7RplDQL.js"data-speed="1" data-theme="solarized-dark" data-autoplay="1" data-loop="1"></script>
 
 ```powershell
+
 Write-Host "🔮 Starting the enchantment to enable Privileged Identity Management (PIM) for groups" -ForegroundColor Cyan
+
+$context = Get-MgContext
+
+if ($null -eq $context) {
+    Write-Host "Graph connection not detected. Requesting user to log in."
+    Connect-MgGraph -Scopes "User.Read.All", "PrivilegedAccess.ReadWrite.AzureADGroup"
+    Write-Host "🧙‍♂️ Context acquired. Current wizard in control: $($context.Account)" -ForegroundColor Yellow
+
+}
+else {
+    Write-Host "🧙‍♂️ Already connected to Graph as $($context.Account.Id)" -ForegroundColor Yellow
+}
 
 # Deciding which groups to enable PIM for
 if (!$groupsCreated) {
@@ -242,73 +254,70 @@ else {
 }
 
 # Displaying the groups chosen for PIM enablement
-Write-Host "📋 Preparing to enable Privileged Identity Management for the following groups:" -ForegroundColor Cyan
-foreach ($group in $groupsToEnable) {
-    Write-Host "🔎 Analyzing group: $($group.DisplayName) with ID: $($group.Id)" -ForegroundColor Magenta
-
-    # Checking the current status of the group in PIM
-    $findGroupInPim = Get-MgIdentityGovernancePrivilegedAccessGroupAssignmentSchedule -Filter "groupId eq '$($group.Id)'"
-    if (!$findGroupInPim) {
-        Write-Host "⚡ Group $($group.DisplayName) is not yet part of PIM. Preparing to onboard." -ForegroundColor Yellow
-
-        # Ensure the user is connected to Azure
-        $context = Get-AzContext
-        if ($null -eq $context) {
-            Write-Host "❗ Azure connection not detected. Requesting user to log in." -ForegroundColor Red
-            Connect-AzAccount
-        }
-        else {
-            Write-Host "🔗 Already connected to Azure as $($context.Account.Id)" -ForegroundColor Green
-        }
-
-        # Acquiring the token to communicate with the PIM API
-        $accessTokenPim = (Get-AzAccessToken -ResourceUrl 'https://api.azrbac.mspim.azure.com').Token
-        $headers = @{
-            "Authorization" = "Bearer $accessTokenPim"
-            "Content-Type"  = "application/json"
-        }
-
-        # The URL to the PIM API for group registration
-        $url = "https://api.azrbac.mspim.azure.com/api/v2/privilegedAccess/aadGroups/resources/register" 
-
-        # Onboarding the group to PIM
-        Write-Host "🧙‍♂️ Onboarding group '$($group.DisplayName)' (ID: $($group.Id)) to PIM." -ForegroundColor Cyan
-        Invoke-RestMethod -Uri $url -Headers $headers -Method Post -Body "{`"externalId`":`"$($group.id)`"}"
-        Write-Host "✅ Group '$($group.DisplayName)' successfully onboarded to PIM." -ForegroundColor Green
+# Inquiring the wizard (you) about their intention to create new groups
+$enableGroups = Read-Host "enable groups in Privileged Identity Management ? (y/n)"
+if ($enableGroups -eq "y") {
+    # Ensure the user is connected to Azure
+    Write-Host "Fetching the current Azure context..."
+    $context = Get-AzContext
+    if ($null -eq $context) {
+        Write-Host "❗ Azure connection not detected. Requesting user to log in." -ForegroundColor Red
+        Connect-AzAccount
     }
     else {
-        Write-Host "🚫 Group $($group.DisplayName) is already part of PIM. No action needed." -ForegroundColor Gray
+        Write-Host "🔗 Already connected to Azure as $($context.Account.Id)" -ForegroundColor Green
     }
+
+    # Acquiring the token to communicate with the PIM API
+    Write-Host "🔑 Acquiring the token to communicate with the Privileged Identity Management (PIM) API..." -ForegroundColor Cyan
+    $accessTokenPim = (Get-AzAccessToken -ResourceUrl 'https://api.azrbac.mspim.azure.com').Token
+    $headers = @{
+        "Authorization" = "Bearer $accessTokenPim"
+        "Content-Type"  = "application/json"
+    }
+
+    Write-Host "📋 Preparing to enable Privileged Identity Management for the following groups:" -ForegroundColor Cyan
+    foreach ($group in $groupsToEnable) {
+        Write-Host "🔎 Analyzing group: $($group.DisplayName) with ID: $($group.Id)" -ForegroundColor Magenta
+    
+
+        # Checking the current status of the group in PIM
+        $findGroupInPim = Get-MgIdentityGovernancePrivilegedAccessGroupEligibilitySchedule -Filter "groupId eq '$($group.Id)'"
+
+        if (!$findGroupInPim) {
+            Write-Host "⚡ Group $($group.DisplayName) is not yet part of PIM. Preparing to onboard." -ForegroundColor Yellow
+           
+            write-host "🔮 Starting the enchantment to enable Privileged Identity Management (PIM) for groups" -ForegroundColor Cyan
+            # The URL to the PIM API for group registration
+            $url = "https://api.azrbac.mspim.azure.com/api/v2/privilegedAccess/aadGroups/resources/register" 
+    
+            # Onboarding the group to PIM
+            Write-Host "🧙‍♂️ Onboarding group '$($group.DisplayName)' (ID: $($group.Id)) to PIM." -ForegroundColor Cyan
+            Invoke-RestMethod -Uri $url -Headers $headers -Method Post -Body "{`"externalId`":`"$($group.id)`"}"
+            Write-Host "✅ Group '$($group.DisplayName)' successfully onboarded to PIM." -ForegroundColor Green
+        }
+        else {
+            Write-Host "🚫 Group $($group.DisplayName) is already part of PIM. No action needed." -ForegroundColor Gray
+        }
+    }
+    
+}
+else {
+    Write-Host "🔮 The wizard has decided not to enable PIM for the selected groups. Ending the enchantment." -ForegroundColor Cyan
 }
 
-
 ```
+
+![GroupsOnboarded](/assets/img/pim-for-groups/GroupsOnboarded.png "GroupsOnboarded")
 
 #### 5. Assigning Users to Groups
 Finally, the script assigns users to the groups for PIM. This process ensures that the right people have the right access at the right time, enhancing security and efficiency.
 
+
+<script async id="asciicast-fMHXCMCK4rMzCiPXWV7RplDQL" src="https://asciinema.org/a/fMHXCMCK4rMzCiPXWV7RplDQL.js" data-speed="1" data-theme="solarized-dark" data-autoplay="1" data-loop="1"></script>
+
+
 ```powershell
-
-Write-Host "===================================================================================================="
-Write-Host "[$($context.Account)] Final phase initiated: Assigning users to groups in Privileged Identity Management."
-
-# Initiating the process of assigning users to the selected groups
-Write-Host "[$($context.Account)] Commencing the user assignment to groups."
-
-# Determining the groups for user assignment
-if (!$groupsToEnable) {
-    Write-Host "[$($context.Account)] No groups specified for enabling. Retrieving all groups for user assignment selection."
-    $groupsToConfigure = Get-MgGroup -All | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select groups for user assignment" -OutputMode Multiple
-}
-else {
-    Write-Host "[$($context.Account)] Preparing to assign users to the recently enabled groups."
-    $groupsToConfigure = $groupsToEnable
-}
-
-# Selecting the users to assign to the groups
-Write-Host "Selecting users to assign to the groups."
-$usersToAssign = Get-MgUser -Filter "AccountEnabled eq true" | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select users for assignment" -OutputMode Multiple
-
 
 # Displaying the groups chosen for PIM enablement
 Write-Host "===================================================================================================="
@@ -317,6 +326,20 @@ Write-Host "🔮 [$($context.Account)] Final phase initiated: Assigning users to
 # Initiating the process of assigning users to the selected groups
 Write-Host "🚀 [$($context.Account)] Commencing the user assignment to groups." -ForegroundColor Magenta
 
+$context = Get-MgContext
+
+if ($null -eq $context) {
+    Write-Host "Graph connection not detected. Requesting user to log in."
+    Connect-MgGraph -Scopes "User.Read.All", "PrivilegedAccess.ReadWrite.AzureADGroup"
+    Write-Host "🧙‍♂️ Context acquired. Current wizard in control: $($context.Account)" -ForegroundColor Yellow
+
+}
+else {
+    Write-Host "🧙‍♂️ Already connected to Graph as $($context.Account.Id)" -ForegroundColor Yellow
+}
+
+# Deciding which groups to enable PIM for
+write-host "🔍 No newly created groups detected. Retrieving all available groups for PIM activation." -ForegroundColor Yellow
 # Determining the groups for user assignment
 if (!$groupsToEnable) {
     Write-Host "🤔 [$($context.Account)] No groups specified for enabling. Retrieving all groups for user assignment selection." -ForegroundColor Yellow
@@ -369,11 +392,15 @@ foreach ($group in $groupsToConfigure) {
     }
 }
 
+
 ```
 
 ## There You Have It: The Power of Eligible Assignments 🧙‍♂️
 
 And with that, we've successfully navigated the arcane waters of Azure PIM, empowering my user account with the Eligible assignments of the new groups. It's a digital alchemy of sorts, where each step brings us closer to mastering the art of cloud identity management.
+
+
+![GroupsEligibility](/assets/img/pim-for-groups/GroupsEligibility.png "GroupsEligibility")
 
 ### 🧙‍♂️ The Magic of Group Membership Activation
 
