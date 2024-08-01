@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
+
 source "https://rubygems.org"
 
-#gem "github-pages", "~> 228", group: :jekyll_plugins
-
-gem "jekyll-theme-chirpy", "~> 6.4", ">= 6.4.2"
+gem "jekyll-theme-chirpy", "~> 7.0", ">= 7.0.1"
 
 group :test do
-  gem "html-proofer", "~> 4.4"
+  gem "html-proofer", "~> 5.0"
 end
 
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem
