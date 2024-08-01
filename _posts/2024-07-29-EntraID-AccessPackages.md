@@ -19,11 +19,11 @@ tags:
     DevOps Practices,
   ]
 image:
-  path: /assets/img/pim-for-groups/thumbnail.png
-  src: /assets/img/pim-for-groups/thumbnail.png
+  path: /assets/img/myaccess.jpeg
+  src: /assets/img/myaccess.jpeg
 toc: true
 ---
-# 🚀 Automating Access Package Creation for Entra ID roles with PowerShell
+# 🏰 Automating Access Package Creation for Entra ID roles with PowerShell
 
 Greetings, fellow wizards of the tech realm! 🧙‍♂️ Today, we embark on a mystical journey into the enchanted forest of PowerShell scripting and Microsoft Graph. Our quest? To automate the creation and management of Access Packages for Entra ID roles. So grab your wands (or keyboards) and let's dive in!
 
@@ -35,7 +35,7 @@ Our mission today is to create a set of Access Packages designed to assign Entra
 
 1. Save valuable time for IT administrators
 2. Reduce human error in role assignments
-3. Ensure consistent application of access policies across the organization
+3. Ensure access revieuws on critical admin roles
 4. Improve security by standardizing the approval process for admin roles
 
 ## 📚 Gathering Our Magical Artifacts
@@ -166,7 +166,7 @@ function Ensure-PimRolesActive {
 
 ```
 
-This function activates the correct PIM roles in oder 
+This function activates the correct PIM roles in order to execute the script
 
 ## 🎨 Crafting the Access Package Spell
 
