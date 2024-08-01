@@ -30,8 +30,11 @@ Greetings, fellow wizards of the tech realm! 🧙‍♂️ Today, we embark on a
 
 Today we will onbark on a juerney to Create a set of new access packages designed in to assign to Entra ID Admin roles.
 Microsoft has made it avalible in Identity Govenance to assign Entra ID roles in PIM with Access packages.
+https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-roles
 
 therefor I wanted to go to the steps to automate this and write a small blog on it if you are looking for the same, as per usuall it requirs some deduction work on the MgGraph powershell modules, so I hope this can help you get started.
+
+
 
 ## Summoning the Essentials
 
@@ -50,11 +53,14 @@ Connect-MgGraph -Scopes "Directory.Read.All", "EntitlementManagement.ReadWrite.A
 ```
 
 ### Permission required
+as of the time of writing this, to add the Entra ID roles to the Catalog, 
+you need to have the Global Administrator role avalible in pim, 
+I had hoped I could get away with the "Privileged Authentication Administrator" role but this seems not to work (yet)
+please test this out in a demo tenant and add a comment if there is another way. 
 
-To modify the Entra ID roles, you need to have the
+https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-roles
 
-https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference
-https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/privileged-roles-permissions
+
 
 With these incantations, we authenticate to Microsoft Graph and prepare for the magic ahead.
 

@@ -40,7 +40,7 @@ function Get-CurrentUserObjectId {
 function Ensure-PimRolesActive {
     param (
         [string[]]$RequiredRoles = @(
-            "Privileged Authentication Administrator",
+            "Global Administrator",
             "Identity Governance Administrator"
         )
     )
@@ -99,18 +99,6 @@ function Ensure-PimRolesActive {
     }
 
     return $true
-}
-
-# Function to select a group
-function Select-Group {
-    Write-Host "🔍 Fetching dynamic groups for selection..."
-    $groups = Get-MgGroup -Filter "groupTypes/any(g:g eq 'DynamicMembership')" | Select-Object DisplayName, Id
-    Write-Host "🔮 Select the Cloud Admin Group..."
-    $selectedGroup = $groups | Out-ConsoleGridView -Title "Select the Cloud Admin Group" -OutputMode Single
-    if ($null -eq $selectedGroup) {
-        throw "No group selected. Exiting script."
-    }
-    return $selectedGroup
 }
 
 function Get-OrCreateAccessPackage {
@@ -278,6 +266,153 @@ function Add-EntraRoleToCatalog {
     }
 }
 
+
+function Get-ApprovalSettings {
+    param (
+        [Parameter(Mandatory=$true)]
+        [array]$EntraIDUsers
+    )
+    $approvalMode = Read-Host "🔮 Do you want a 1 or 2 step verification process? (Enter '1' or '2')"
+    $firstStageApprovers = @()
+    $secondStageApprovers = @()
+    
+    if ($approvalMode -eq '1' -or $approvalMode -eq '2') {
+        $approverType = Read-Host "🔮 Do you want the first stage to be approved by a 'Manager' or 'User(s)'?"
+        if ($approverType -eq 'Manager') {
+            $firstStageApprovers += @{
+                "@odata.type" = "#microsoft.graph.requestorManager"
+                managerLevel = 1
+            }
+            
+            # Select multiple backup approvers
+            $backupApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select backup user(s) for first stage" -OutputMode Multiple
+            foreach ($approver in $backupApprovers) {
+                $firstStageApprovers += @{
+                    "@odata.type" = "#microsoft.graph.singleUser"
+                    userId = $approver.Id
+                    isBackup = $true
+                }
+                Write-Host "Added $($approver.DisplayName) as a backup approver."
+            }
+        } elseif ($approverType -eq 'User(s)') {
+            # Select multiple primary approvers
+            $primaryApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select primary approver(s) for first stage" -OutputMode Multiple
+            foreach ($approver in $primaryApprovers) {
+                $firstStageApprovers += @{
+                    "@odata.type" = "#microsoft.graph.singleUser"
+                    userId = $approver.Id
+                }
+                Write-Host "Added $($approver.DisplayName) as a primary approver."
+            }
+
+            # Select multiple backup approvers
+            $backupApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select backup user(s) for first stage" -OutputMode Multiple
+            foreach ($approver in $backupApprovers) {
+                $firstStageApprovers += @{
+                    "@odata.type" = "#microsoft.graph.singleUser"
+                    userId = $approver.Id
+                    isBackup = $true
+                }
+                Write-Host "Added $($approver.DisplayName) as a backup approver."
+            }
+        } else {
+            throw "Invalid approver type selected. Exiting script."
+        }
+    }
+
+    if ($approvalMode -eq '2') {
+        # Second stage
+        $secondStageApproverType = Read-Host "🔮 Do you want the second stage to be approved by 'Manager' or 'User(s)'?"
+        
+        if ($secondStageApproverType -eq 'Manager') {
+            $secondStageApprovers += @{
+                "@odata.type" = "#microsoft.graph.requestorManager"
+                managerLevel = 1
+            }
+        } elseif ($secondStageApproverType -eq 'User(s)') {
+            # Select multiple primary approvers for second stage
+            $primaryApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select primary approver(s) for second stage" -OutputMode Multiple
+            foreach ($approver in $primaryApprovers) {
+                $secondStageApprovers += @{
+                    "@odata.type" = "#microsoft.graph.singleUser"
+                    userId = $approver.Id
+                }
+                Write-Host "Added $($approver.DisplayName) as a primary approver for second stage."
+            }
+        } else {
+            throw "Invalid approver type selected for second stage. Exiting script."
+        }
+
+        # Select multiple backup approvers for second stage
+        $backupApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select backup user(s) for second stage" -OutputMode Multiple
+        foreach ($approver in $backupApprovers) {
+            $secondStageApprovers += @{
+                "@odata.type" = "#microsoft.graph.singleUser"
+                userId = $approver.Id
+                isBackup = $true
+            }
+            Write-Host "Added $($backupApprover.DisplayName) as a backup approver for second stage."
+        }
+    } elseif ($approvalMode -ne '1') {
+        throw "Invalid verification process selected. Exiting script."
+    }
+
+    return @{
+        ApprovalMode = $approvalMode
+        FirstStageApprovers = $firstStageApprovers
+        SecondStageApprovers = $secondStageApprovers
+    }
+}
+
+# get access review settings with improved multiple reviewer selection
+function Get-AccessReviewSettings {
+    param (
+        [Parameter(Mandatory=$true)]
+        [array]$EntraIDUsers
+    )
+    $enableAccessReview = Read-Host "🔮 Do you want to enable access reviews? (Enter 'Yes' or 'No')"
+    if ($enableAccessReview -eq 'Yes') {
+        $reviewerType = Read-Host "🔮 Should the manager be the reviewer? (Enter 'Yes' or 'No')"
+        
+        $backupReviewers = $EntraIDUsers | Out-ConsoleGridView -Title "Select backup reviewer(s) for access review" -OutputMode Multiple
+
+        $reviewers = @()
+        foreach ($reviewer in $backupReviewers) {
+            $reviewers += @{
+                "@odata.type" = "#microsoft.graph.singleUser"
+                userId = $reviewer.Id
+                isBackup = $true
+            }
+            Write-Host "Added $($reviewer.DisplayName) as a backup reviewer for access review."
+        }
+
+        return @{
+            isEnabled = $true
+            recurrenceType = "quarterly"
+            reviewerType = if ($reviewerType -eq 'Yes') { "Manager" } else { "Self" }
+            startDateTime = (Get-Date).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+            durationInDays = 25
+            reviewers = $reviewers
+            isAccessRecommendationEnabled = $true
+            isApprovalJustificationRequired = $true
+            accessReviewTimeoutBehavior = "keepAccess"
+        }
+    }
+    return @{ isEnabled = $false }
+}
+
+# Modified function to select a group
+function Select-Group {
+    Write-Host "🔍 Fetching dynamic groups for selection..."
+    $groups = Get-MgGroup -Filter "groupTypes/any(g:g eq 'DynamicMembership')" | Select-Object DisplayName, Id
+    Write-Host "🔮 Select the Cloud Admin Group..."
+    $selectedGroup = $groups | Out-ConsoleGridView -Title "Select the Cloud Admin Group" -OutputMode Single
+    if ($null -eq $selectedGroup) {
+        throw "No group selected. Exiting script."
+    }
+    return $selectedGroup
+}
+# Modified Add-PolicyToAccessPackage function
 function Add-PolicyToAccessPackage {
     param (
         [Parameter(Mandatory=$true)]
@@ -287,7 +422,13 @@ function Add-PolicyToAccessPackage {
         [string]$RoleName,
         
         [Parameter(Mandatory=$true)]
-        [string]$GroupId
+        [string]$GroupId,
+
+        [Parameter(Mandatory=$true)]
+        [hashtable]$ApprovalSettings,
+
+        [Parameter(Mandatory=$true)]
+        [hashtable]$AccessReviewSettings
     )
 
     Write-Host "🔍 Processing policy for access package..." -ForegroundColor Yellow
@@ -297,76 +438,6 @@ function Add-PolicyToAccessPackage {
     # Check if policy already exists
     $existingPolicies = Get-MgBetaEntitlementManagementAccessPackageAssignmentPolicy -All
     $existingPolicy = $existingPolicies | Where-Object { $_.AccessPackageId -eq $AccessPackageId -and $_.DisplayName -eq $policyDisplayName }
-
-    $approvalMode = Read-Host "🔮 Do you want a 1 or 2 step verification process? (Enter '1' or '2')"
-    $firstStageApprovers = @()
-    $secondStageApprovers = @()
-    
-    if ($approvalMode -eq '1') {
-        $approverType = Read-Host "🔮 Do you want the first stage to be approved by a 'Manager' or 'Single User'?"
-        if ($approverType -eq 'Manager') {
-            $firstStageApprovers += @{
-                "@odata.type" = "#microsoft.graph.requestorManager"
-                managerLevel = 1
-            }
-            $backupApprover = (Get-MgUser -Filter "AccountEnabled eq true" | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select the backup user for first stage" -PassThru).Id
-            $firstStageApprovers += @{
-                "@odata.type" = "#microsoft.graph.singleUser"
-                userId = $backupApprover
-                isBackup = $true
-            }
-        } elseif ($approverType -eq 'Single User') {
-            $firstStageApprovers += @{
-                "@odata.type" = "#microsoft.graph.singleUser"
-                userId = (Get-MgUser -Filter "AccountEnabled eq true" | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select the first stage approver" -PassThru).Id
-            }
-        } else {
-            throw "Invalid approver type selected. Exiting script."
-        }
-    } elseif ($approvalMode -eq '2') {
-        # First stage
-        $firstStageApprovers += @{
-            "@odata.type" = "#microsoft.graph.requestorManager"
-            managerLevel = 1
-        }
-        $backupApprover = (Get-MgUser -Filter "AccountEnabled eq true" | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select the backup user for first stage" -PassThru).Id
-        $firstStageApprovers += @{
-            "@odata.type" = "#microsoft.graph.singleUser"
-            userId = $backupApprover
-            isBackup = $true
-        }
-        
-        # Second stage
-        $secondStageApprovers += @{
-            "@odata.type" = "#microsoft.graph.singleUser"
-            userId = (Get-MgUser -Filter "AccountEnabled eq true" | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select the second stage approver" -PassThru).Id
-        }
-    } else {
-        throw "Invalid verification process selected. Exiting script."
-    }
-
-    $enableAccessReview = Read-Host "🔮 Do you want to enable access reviews? (Enter 'Yes' or 'No')"
-    $accessReviewSettings = @{}
-    if ($enableAccessReview -eq 'Yes') {
-        $reviewerType = Read-Host "🔮 Should the manager be the reviewer? (Enter 'Yes' or 'No')"
-        $accessReviewSettings = @{
-            isEnabled = $true
-            recurrenceType = "quarterly"
-            reviewerType = if ($reviewerType -eq 'Yes') { "Manager" } else { "Self" }
-            startDateTime = (Get-Date).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-            durationInDays = 25
-            reviewers = @(
-                @{
-                    "@odata.type" = "#microsoft.graph.singleUser"
-                    userId = (Get-MgUser -Filter "AccountEnabled eq true" | Select-Object DisplayName, Id | Out-ConsoleGridView -Title "Select the backup user for access review" -PassThru).Id
-                    isBackup = $true
-                }
-            )
-            isAccessRecommendationEnabled = $true
-            isApprovalJustificationRequired = $true
-            accessReviewTimeoutBehavior = "keepAccess"
-        }
-    }
 
     $policyParams = @{
         accessPackageId = $AccessPackageId
@@ -394,17 +465,11 @@ function Add-PolicyToAccessPackage {
                     approvalStageTimeOutInDays = 14
                     isApproverJustificationRequired = $true
                     isEscalationEnabled = $false
-                    primaryApprovers = $firstStageApprovers
-                },
-                @{
-                    approvalStageTimeOutInDays = 14
-                    isApproverJustificationRequired = $true
-                    isEscalationEnabled = $false
-                    primaryApprovers = $secondStageApprovers
+                    primaryApprovers = $ApprovalSettings.FirstStageApprovers
                 }
             )
         }
-        accessReviewSettings = $accessReviewSettings
+        accessReviewSettings = $AccessReviewSettings
         questions = @(
             @{
                 isRequired = $true
@@ -416,6 +481,15 @@ function Add-PolicyToAccessPackage {
                 isSingleLineQuestion = $false
             }
         )
+    }
+
+    if ($ApprovalSettings.ApprovalMode -eq '2') {
+        $policyParams.requestApprovalSettings.approvalStages += @{
+            approvalStageTimeOutInDays = 14
+            isApproverJustificationRequired = $true
+            isEscalationEnabled = $false
+            primaryApprovers = $ApprovalSettings.SecondStageApprovers
+        }
     }
 
     try {
@@ -438,7 +512,6 @@ function Add-PolicyToAccessPackage {
 }
 
 
-
 # Main script section
 
 Write-Host "🔮 Starting the magical process..."
@@ -456,7 +529,7 @@ Connect-MgGraph -Scopes "Directory.Read.All", "EntitlementManagement.ReadWrite.A
 
 
 # Ensure required PIM roles are active
-if (Ensure-PimRolesActive) {
+if (Ensure-PimRolesActive -RequiredRoles @("Global Administrator", "Identity Governance Administrator")) {
     Write-Host "All required roles are active or activation has been requested." -ForegroundColor Green
 } else {
     Write-Host "Failed to ensure all required roles are active. Please check the output above for details." -ForegroundColor Red
@@ -478,6 +551,17 @@ $directoryRoles = Get-MgDirectoryRole -All | Where-Object { $null -ne $_.RoleTem
 # Select the cloud admin group
 $cloudAdminGroup = Select-Group
 Write-Host "✅ Selected Cloud Admin Group: $($cloudAdminGroup.DisplayName)"
+# Get all enabled Entra ID users
+
+Write-Host "👥 Fetching all enabled Entra ID users..."
+$entraIDUsers = Get-MgUser -Filter "AccountEnabled eq true" -All | Select-Object DisplayName, Id
+
+
+# Get approval settings once
+$approvalSettings = Get-ApprovalSettings -EntraIDUsers $entraIDUsers
+
+# Get access review settings once
+$accessReviewSettings = Get-AccessReviewSettings -EntraIDUsers $entraIDUsers
 
 # Add each role to the catalog
 foreach ($role in $directoryRoles) {
@@ -485,19 +569,22 @@ foreach ($role in $directoryRoles) {
     Add-EntraRoleToCatalog -CatalogId $catalog.Id -Role $role
 }
 
-# Create access packages and add role scopes
+# Add each role to the catalog and create access packages
 foreach ($role in $directoryRoles) {
     $roleName = $role.DisplayName
     Write-Host "🔮 Processing access package for role: $roleName"
 
     try {
+        Write-Host "✨ Adding role $($role.DisplayName) to catalog..."
+        Add-EntraRoleToCatalog -CatalogId $catalog.Id -Role $role
+
         $accessPackage = Get-OrCreateAccessPackage -RoleName $roleName -CatalogId $catalog.Id -RoleId $role.RoleTemplateId
         
         # Add role scope to the access package
         Add-RoleScopeToAccessPackage -AccessPackageId $accessPackage.Id -Role $role -CatalogId $catalog.Id
 
         # Add policy to the access package
-        Add-PolicyToAccessPackage -AccessPackageId $accessPackage.Id -RoleName $roleName -GroupId $cloudAdminGroup.Id
+        Add-PolicyToAccessPackage -AccessPackageId $accessPackage.Id -RoleName $roleName -GroupId $cloudAdminGroup.Id -ApprovalSettings $approvalSettings -AccessReviewSettings $accessReviewSettings
     }
     catch {
         Write-Host "❌ Failed to process access package for "$roleName": $_" -ForegroundColor Red
