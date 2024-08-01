@@ -3,7 +3,7 @@ layout: post
 title: "🚀 Automating Access Package Creation for Entra ID roles with PowerShell"
 date: 2024-08-01 07:40:59 +0100
 comments: true
-description: "Discover the magic of automating PIM for groups with PowerShell and GraphAPI in Azure."
+description: "Discover the magic of automating Entra ID roles with PowerShell and GraphAPI in Azure."
 categories: [Azure, PowerShell, Cloud Computing, DevOps, Entra ID, GraphAPI]
 tags:
   [
@@ -35,7 +35,7 @@ Our mission today is to create a set of Access Packages designed to assign Entra
 
 1. Save valuable time for IT administrators
 2. Reduce human error in role assignments
-3. Ensure access revieuws on critical admin roles
+3. Ensure access reviews on critical admin roles
 4. Improve security by standardizing the approval process for admin roles
 
 ## 📚 Gathering Our Magical Artifacts
@@ -742,4 +742,4 @@ Remember, with great power comes great responsibility. Use these scripts wisely,
 
 Until next time, keep conjuring those magical scripts! ☕🧙‍♂️
 
-You can find the full script on GitHub: [Create-Access-Package.ps1](https://github.com/Dikkekip/dikkekip.github.io/blob/b308880aa43788f25c93127d1aa081e897b5eddf/scripts/2024-07-29-EntraID-AccessPackages/Create-Access-Package.ps1)
+You can find the full script on GitHub: [Create-Access-Package.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-EntraID-AccessPackages/Create-Access-Package.ps1)
