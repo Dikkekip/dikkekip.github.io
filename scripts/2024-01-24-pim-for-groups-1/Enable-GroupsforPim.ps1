@@ -126,7 +126,7 @@ foreach ($group in $groupsToEnable) {
     Write-Host "🔎 Analyzing group: $($group.DisplayName) with ID: $($group.Id)" -ForegroundColor Magenta
 
     # Checking the current status of the group in PIM
-    $findGroupInPim = Get-MgIdentityGovernancePrivilegedAccessGroupAssignmentSchedule -Filter "groupId eq '$($group.Id)'"
+    $findGroupInPim = Get-MgIdentityGovernancePrivilegedAccessGroupAssignmentSchedule -Filter "groupId eq '$($group.Id)'" -ErrorAction Ignore
     if (!$findGroupInPim) {
         Write-Host "⚡ Group $($group.DisplayName) is not yet part of PIM. Preparing to onboard." -ForegroundColor Yellow
 
@@ -141,18 +141,22 @@ foreach ($group in $groupsToEnable) {
         }
 
         # Acquiring the token to communicate with the PIM API
-        $accessTokenPim = (Get-AzAccessToken -ResourceUrl 'https://api.azrbac.mspim.azure.com').Token
-        $headers = @{
-            "Authorization" = "Bearer $accessTokenPim"
-            "Content-Type"  = "application/json"
-        }
-
-        # The URL to the PIM API for group registration
-        $url = "https://api.azrbac.mspim.azure.com/api/v2/privilegedAccess/aadGroups/resources/register" 
-
-        # Onboarding the group to PIM
         Write-Host "🧙‍♂️ Onboarding group '$($group.DisplayName)' (ID: $($group.Id)) to PIM." -ForegroundColor Cyan
-        Invoke-RestMethod -Uri $url -Headers $headers -Method Post -Body "{`"externalId`":`"$($group.id)`"}"
+
+        $accessTokenPim = (Get-AzAccessToken -ResourceUrl 'https://api.azrbac.mspim.azure.com').Token
+        $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+        $session.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0"
+
+        $response = Invoke-RestMethod -Uri "https://api.azrbac.mspim.azure.com/api/v2/privilegedAccess/aadGroups/resources/register" `
+                    -Method "POST" `
+                    -Headers @{
+                        "Accept-Language"        = "en"
+                        "Authorization"          = "Bearer $accessTokenPim"
+                        "x-ms-effective-locale"  = "en.en-gb"
+                        "Accept"                 = "*/*"
+                    } `
+                    -ContentType "application/json" `
+                    -Body "{`"externalId`":`"$($groupId)`"}"
         Write-Host "✅ Group '$($group.DisplayName)' successfully onboarded to PIM." -ForegroundColor Green
     }
     else {
