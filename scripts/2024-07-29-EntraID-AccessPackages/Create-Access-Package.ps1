@@ -1,32 +1,46 @@
 <#
 .SYNOPSIS
-Selects a group from the list of dynamic groups.
+Creates or updates access packages for Entra ID admin roles with a touch of magic.
 
 .DESCRIPTION
-This function fetches the dynamic groups and allows the user to select a group from the list using a graphical interface. If no group is selected, an exception is thrown.
+This script is your magical wand for managing Entra ID admin roles through access packages. 
+It creates a catalog, adds Entra ID roles to it, and sets up access packages with custom 
+approval and review settings. It's like organizing a grand wizard's spellbook, but for 
+Entra ID permissions!
 
 .PARAMETER None
-
-.INPUTS
-None
-
-.OUTPUTS
-System.Management.Automation.PSCustomObject
+This script doesn't take any parameters. It's as user-friendly as a friendly dragon!
 
 .EXAMPLE
-$selectedGroup = Select-Group
-# Selects a group from the list of dynamic groups and assigns it to the $selectedGroup variable.
+.\Create-EntraIDAccessPackages.ps1
+# Run the script and follow the magical prompts to create your access packages.
 
 .NOTES
-This function requires the `Get-MgGroup` cmdlet from the Microsoft Graph PowerShell module.
+- Requires the following PowerShell modules:
+  * Microsoft.Graph.Authentication
+  * Microsoft.Graph.Beta.Identity.Governance
+  * Microsoft.Graph.Identity.DirectoryManagement
+- You need to be a Global Administrator or Identity Governance Administrator to run this script.
+- The Global Administrator role is excluded from the access packages for security reasons.
+- Prepare for a whimsical journey through Entra ID management!
 
 .LINK
-Get-MgGroup
+https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-access-package-first
 #>
 
+# Function to select a group
+
 function Select-Group {
-    # Function code here
+    Write-Host "🔍 Fetching dynamic groups for selection..."
+    $groups = Get-MgGroup -Filter "groupTypes/any(g:g eq 'DynamicMembership')" | Select-Object DisplayName, Id
+    Write-Host "🔮 Select the Cloud Admin Group..."
+    $selectedGroup = $groups | Out-ConsoleGridView -Title "Select the Cloud Admin Group" -OutputMode Single
+    if ($null -eq $selectedGroup) {
+        throw "No group selected. Exiting script."
+    }
+    return $selectedGroup
 }
+
 
 
 # Function to get the current user's Object ID
@@ -64,18 +78,19 @@ function Ensure-PimRolesActive {
         $activeAssignments = Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance -Filter "roleDefinitionId eq '$roleId' and principalId eq '$currentUserObjectId'"
         if ($activeAssignments) {
             Write-Host "✅ PIM role $roleName is already active." -ForegroundColor Green
-        } else {
+        }
+        else {
             Write-Host "🧙‍♂️ Activating PIM role $roleName for 1 hour..."
             $params = @{
-                action = "selfActivate"
-                principalId = $currentUserObjectId
+                action           = "selfActivate"
+                principalId      = $currentUserObjectId
                 roleDefinitionId = $roleId
                 directoryScopeId = "/"
-                justification = "Script execution: Activating $roleName role"
-                scheduleInfo = @{
+                justification    = "Script execution: Activating $roleName role"
+                scheduleInfo     = @{
                     startDateTime = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-                    expiration = @{
-                        type = "AfterDuration"
+                    expiration    = @{
+                        type     = "AfterDuration"
                         duration = "PT1H"
                     }
                 }
@@ -84,7 +99,8 @@ function Ensure-PimRolesActive {
                 New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -BodyParameter $params
                 Write-Host "✨ PIM role $roleName activation requested." -ForegroundColor Green
                 $activationPerformed = $true
-            } catch {
+            }
+            catch {
                 Write-Host "❌ Failed to activate PIM role $roleName. Error: $_" -ForegroundColor Red
                 return $false
             }
@@ -103,13 +119,13 @@ function Ensure-PimRolesActive {
 
 function Get-OrCreateAccessPackage {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$RoleName,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$RoleId,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$CatalogId
     )
 
@@ -127,8 +143,8 @@ function Get-OrCreateAccessPackage {
     $params = @{
         DisplayName = $displayName
         Description = "Access package for $RoleName role"
-        CatalogId = $CatalogId
-        IsHidden = $false
+        CatalogId   = $CatalogId
+        IsHidden    = $false
     }
 
     Write-Host "✨ Creating new access package: $displayName..."
@@ -139,13 +155,13 @@ function Get-OrCreateAccessPackage {
 
 function Add-RoleScopeToAccessPackage {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$AccessPackageId,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$CatalogId,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [object]$Role
     )
 
@@ -174,20 +190,20 @@ function Add-RoleScopeToAccessPackage {
 
     $params = @{
         AccessPackageId = $AccessPackageId
-        BodyParameter = @{
-            accessPackageResourceRole = @{
-                originId = "Eligible"
-                displayName = "Eligible Member"
-                originSystem = "DirectoryRole"
+        BodyParameter   = @{
+            accessPackageResourceRole  = @{
+                originId              = "Eligible"
+                displayName           = "Eligible Member"
+                originSystem          = "DirectoryRole"
                 accessPackageResource = @{
-                    id = $roleResource.Id
+                    id           = $roleResource.Id
                     resourceType = "Built-in"
-                    originId = $Role.RoleTemplateId
+                    originId     = $Role.RoleTemplateId
                     originSystem = "DirectoryRole"
                 }
             }
             accessPackageResourceScope = @{
-                originId = $Role.RoleTemplateId
+                originId     = $Role.RoleTemplateId
                 originSystem = "DirectoryRole"
             }
         }
@@ -216,8 +232,8 @@ function Get-OrCreateCatalog {
     if ($null -eq $catalog) {
         Write-Host "⚠️ Catalog '$CatalogName' not found. Creating new catalog..." -ForegroundColor Yellow
         $newCatalog = @{
-            displayName = $CatalogName
-            description = "Catalog for Entra Admin roles"
+            displayName         = $CatalogName
+            description         = "Catalog for Entra Admin roles"
             isExternallyVisible = $false
         }
         $catalog = New-MgEntitlementManagementCatalog -BodyParameter $newCatalog
@@ -228,10 +244,10 @@ function Get-OrCreateCatalog {
 
 function Add-EntraRoleToCatalog {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$CatalogId,
        
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [object]$Role
     )
 
@@ -244,16 +260,16 @@ function Add-EntraRoleToCatalog {
     }
 
     $params = @{
-        catalogId = $CatalogId
-        requestType = "AdminAdd"
+        catalogId             = $CatalogId
+        requestType           = "AdminAdd"
         accessPackageResource = @{
-            displayName = $Role.DisplayName
-            description = $Role.Description
+            displayName  = $Role.DisplayName
+            description  = $Role.Description
             resourceType = "Built-in"
-            originId = $Role.RoleTemplateId
+            originId     = $Role.RoleTemplateId
             originSystem = "DirectoryRole"
         }
-        justification = "Adding Directory Role to Catalog"
+        justification         = "Adding Directory Role to Catalog"
     }
 
     try {
@@ -269,7 +285,7 @@ function Add-EntraRoleToCatalog {
 
 function Get-ApprovalSettings {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [array]$EntraIDUsers
     )
     $approvalMode = Read-Host "🔮 Do you want a 1 or 2 step verification process? (Enter '1' or '2')"
@@ -277,70 +293,89 @@ function Get-ApprovalSettings {
     $secondStageApprovers = @()
     
     if ($approvalMode -eq '1' -or $approvalMode -eq '2') {
-        $approverType = Read-Host "🔮 Do you want the first stage to be approved by a 'Manager' or 'User(s)'?"
-        if ($approverType -eq 'Manager') {
-            $firstStageApprovers += @{
-                "@odata.type" = "#microsoft.graph.requestorManager"
-                managerLevel = 1
-            }
-            
-            # Select multiple backup approvers
-            $backupApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select backup user(s) for first stage" -OutputMode Multiple
-            foreach ($approver in $backupApprovers) {
-                $firstStageApprovers += @{
-                    "@odata.type" = "#microsoft.graph.singleUser"
-                    userId = $approver.Id
-                    isBackup = $true
-                }
-                Write-Host "Added $($approver.DisplayName) as a backup approver."
-            }
-        } elseif ($approverType -eq 'User(s)') {
-            # Select multiple primary approvers
-            $primaryApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select primary approver(s) for first stage" -OutputMode Multiple
-            foreach ($approver in $primaryApprovers) {
-                $firstStageApprovers += @{
-                    "@odata.type" = "#microsoft.graph.singleUser"
-                    userId = $approver.Id
-                }
-                Write-Host "Added $($approver.DisplayName) as a primary approver."
-            }
+        $approverType = Read-Host "🔮 Choose the approver type for the first stage:
+1. Manager
+2. Specific User(s)
+Enter the number of your choice (1 or 2)"
 
-            # Select multiple backup approvers
-            $backupApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select backup user(s) for first stage" -OutputMode Multiple
-            foreach ($approver in $backupApprovers) {
+        switch ($approverType) {
+            "1" {
+                # Manager
                 $firstStageApprovers += @{
-                    "@odata.type" = "#microsoft.graph.singleUser"
-                    userId = $approver.Id
-                    isBackup = $true
+                    "@odata.type" = "#microsoft.graph.requestorManager"
+                    managerLevel  = 1
                 }
-                Write-Host "Added $($approver.DisplayName) as a backup approver."
+                
+                # Select multiple backup approvers
+                $backupApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select backup user(s) for first stage" -OutputMode Multiple
+                foreach ($approver in $backupApprovers) {
+                    $firstStageApprovers += @{
+                        "@odata.type" = "#microsoft.graph.singleUser"
+                        userId        = $approver.Id
+                        isBackup      = $true
+                    }
+                    Write-Host "Added $($approver.DisplayName) as a backup approver."
+                }
             }
-        } else {
-            throw "Invalid approver type selected. Exiting script."
+            "2" {
+                # Specific User(s)
+                # Select multiple primary approvers
+                $primaryApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select primary approver(s) for first stage" -OutputMode Multiple
+                foreach ($approver in $primaryApprovers) {
+                    $firstStageApprovers += @{
+                        "@odata.type" = "#microsoft.graph.singleUser"
+                        userId        = $approver.Id
+                    }
+                    Write-Host "Added $($approver.DisplayName) as a primary approver."
+                }
+
+                # Select multiple backup approvers
+                $backupApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select backup user(s) for first stage" -OutputMode Multiple
+                foreach ($approver in $backupApprovers) {
+                    $firstStageApprovers += @{
+                        "@odata.type" = "#microsoft.graph.singleUser"
+                        userId        = $approver.Id
+                        isBackup      = $true
+                    }
+                    Write-Host "Added $($approver.DisplayName) as a backup approver."
+                }
+            }
+            default {
+                throw "Invalid approver type selected. Exiting script."
+            }
         }
     }
 
     if ($approvalMode -eq '2') {
         # Second stage
-        $secondStageApproverType = Read-Host "🔮 Do you want the second stage to be approved by 'Manager' or 'User(s)'?"
+        $secondStageApproverType = Read-Host "🔮 Choose the approver type for the second stage:
+1. Manager
+2. Specific User(s)
+Enter the number of your choice (1 or 2)"
         
-        if ($secondStageApproverType -eq 'Manager') {
-            $secondStageApprovers += @{
-                "@odata.type" = "#microsoft.graph.requestorManager"
-                managerLevel = 1
-            }
-        } elseif ($secondStageApproverType -eq 'User(s)') {
-            # Select multiple primary approvers for second stage
-            $primaryApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select primary approver(s) for second stage" -OutputMode Multiple
-            foreach ($approver in $primaryApprovers) {
+        switch ($secondStageApproverType) {
+            "1" {
+                # Manager
                 $secondStageApprovers += @{
-                    "@odata.type" = "#microsoft.graph.singleUser"
-                    userId = $approver.Id
+                    "@odata.type" = "#microsoft.graph.requestorManager"
+                    managerLevel  = 1
                 }
-                Write-Host "Added $($approver.DisplayName) as a primary approver for second stage."
             }
-        } else {
-            throw "Invalid approver type selected for second stage. Exiting script."
+            "2" {
+                # Specific User(s)
+                # Select multiple primary approvers for second stage
+                $primaryApprovers = $EntraIDUsers | Out-ConsoleGridView -Title "Select primary approver(s) for second stage" -OutputMode Multiple
+                foreach ($approver in $primaryApprovers) {
+                    $secondStageApprovers += @{
+                        "@odata.type" = "#microsoft.graph.singleUser"
+                        userId        = $approver.Id
+                    }
+                    Write-Host "Added $($approver.DisplayName) as a primary approver for second stage."
+                }
+            }
+            default {
+                throw "Invalid approver type selected for second stage. Exiting script."
+            }
         }
 
         # Select multiple backup approvers for second stage
@@ -348,18 +383,19 @@ function Get-ApprovalSettings {
         foreach ($approver in $backupApprovers) {
             $secondStageApprovers += @{
                 "@odata.type" = "#microsoft.graph.singleUser"
-                userId = $approver.Id
-                isBackup = $true
+                userId        = $approver.Id
+                isBackup      = $true
             }
-            Write-Host "Added $($backupApprover.DisplayName) as a backup approver for second stage."
+            Write-Host "Added $($approver.DisplayName) as a backup approver for second stage."
         }
-    } elseif ($approvalMode -ne '1') {
+    }
+    elseif ($approvalMode -ne '1') {
         throw "Invalid verification process selected. Exiting script."
     }
 
     return @{
-        ApprovalMode = $approvalMode
-        FirstStageApprovers = $firstStageApprovers
+        ApprovalMode         = $approvalMode
+        FirstStageApprovers  = $firstStageApprovers
         SecondStageApprovers = $secondStageApprovers
     }
 }
@@ -367,7 +403,7 @@ function Get-ApprovalSettings {
 # get access review settings with improved multiple reviewer selection
 function Get-AccessReviewSettings {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [array]$EntraIDUsers
     )
     $enableAccessReview = Read-Host "🔮 Do you want to enable access reviews? (Enter 'Yes' or 'No')"
@@ -380,54 +416,43 @@ function Get-AccessReviewSettings {
         foreach ($reviewer in $backupReviewers) {
             $reviewers += @{
                 "@odata.type" = "#microsoft.graph.singleUser"
-                userId = $reviewer.Id
-                isBackup = $true
+                userId        = $reviewer.Id
+                isBackup      = $true
             }
             Write-Host "Added $($reviewer.DisplayName) as a backup reviewer for access review."
         }
 
         return @{
-            isEnabled = $true
-            recurrenceType = "quarterly"
-            reviewerType = if ($reviewerType -eq 'Yes') { "Manager" } else { "Self" }
-            startDateTime = (Get-Date).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-            durationInDays = 25
-            reviewers = $reviewers
-            isAccessRecommendationEnabled = $true
+            isEnabled                       = $true
+            recurrenceType                  = "quarterly"
+            reviewerType                    = if ($reviewerType -eq 'Yes') { "Manager" } else { "Self" }
+            startDateTime                   = (Get-Date).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+            durationInDays                  = 25
+            reviewers                       = $reviewers
+            isAccessRecommendationEnabled   = $true
             isApprovalJustificationRequired = $true
-            accessReviewTimeoutBehavior = "keepAccess"
+            accessReviewTimeoutBehavior     = "keepAccess"
         }
     }
     return @{ isEnabled = $false }
 }
 
-# Modified function to select a group
-function Select-Group {
-    Write-Host "🔍 Fetching dynamic groups for selection..."
-    $groups = Get-MgGroup -Filter "groupTypes/any(g:g eq 'DynamicMembership')" | Select-Object DisplayName, Id
-    Write-Host "🔮 Select the Cloud Admin Group..."
-    $selectedGroup = $groups | Out-ConsoleGridView -Title "Select the Cloud Admin Group" -OutputMode Single
-    if ($null -eq $selectedGroup) {
-        throw "No group selected. Exiting script."
-    }
-    return $selectedGroup
-}
-# Modified Add-PolicyToAccessPackage function
+
 function Add-PolicyToAccessPackage {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$AccessPackageId,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$RoleName,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$GroupId,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [hashtable]$ApprovalSettings,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [hashtable]$AccessReviewSettings
     )
 
@@ -440,44 +465,44 @@ function Add-PolicyToAccessPackage {
     $existingPolicy = $existingPolicies | Where-Object { $_.AccessPackageId -eq $AccessPackageId -and $_.DisplayName -eq $policyDisplayName }
 
     $policyParams = @{
-        accessPackageId = $AccessPackageId
-        displayName = $policyDisplayName
-        description = "Policy for requesting the following EntraID role: $RoleName"
-        canExtend = $false
-        durationInDays = 365
-        requestorSettings = @{
-            scopeType = "SpecificDirectorySubjects"
-            acceptRequests = $true
+        accessPackageId         = $AccessPackageId
+        displayName             = $policyDisplayName
+        description             = "Policy for requesting the following EntraID role: $RoleName"
+        canExtend               = $false
+        durationInDays          = 365
+        requestorSettings       = @{
+            scopeType         = "SpecificDirectorySubjects"
+            acceptRequests    = $true
             allowedRequestors = @(
                 @{
                     "@odata.type" = "#microsoft.graph.groupMembers"
-                    groupId = $GroupId
+                    groupId       = $GroupId
                 }
             )
         }
         requestApprovalSettings = @{
-            isApprovalRequired = $true
-            isApprovalRequiredForExtension = $false
+            isApprovalRequired               = $true
+            isApprovalRequiredForExtension   = $false
             isRequestorJustificationRequired = $true
-            approvalMode = "Serial"
-            approvalStages = @(
+            approvalMode                     = "Serial"
+            approvalStages                   = @(
                 @{
-                    approvalStageTimeOutInDays = 14
+                    approvalStageTimeOutInDays      = 14
                     isApproverJustificationRequired = $true
-                    isEscalationEnabled = $false
-                    primaryApprovers = $ApprovalSettings.FirstStageApprovers
+                    isEscalationEnabled             = $false
+                    primaryApprovers                = $ApprovalSettings.FirstStageApprovers
                 }
             )
         }
-        accessReviewSettings = $AccessReviewSettings
-        questions = @(
+        accessReviewSettings    = $AccessReviewSettings
+        questions               = @(
             @{
-                isRequired = $true
-                text = @{
-                    defaultText = "Why do you require this role?"
+                isRequired           = $true
+                text                 = @{
+                    defaultText    = "Why do you require this role?"
                     localizedTexts = @()
                 }
-                "@odata.type" = "#microsoft.graph.accessPackageTextInputQuestion"
+                "@odata.type"        = "#microsoft.graph.accessPackageTextInputQuestion"
                 isSingleLineQuestion = $false
             }
         )
@@ -485,10 +510,10 @@ function Add-PolicyToAccessPackage {
 
     if ($ApprovalSettings.ApprovalMode -eq '2') {
         $policyParams.requestApprovalSettings.approvalStages += @{
-            approvalStageTimeOutInDays = 14
+            approvalStageTimeOutInDays      = 14
             isApproverJustificationRequired = $true
-            isEscalationEnabled = $false
-            primaryApprovers = $ApprovalSettings.SecondStageApprovers
+            isEscalationEnabled             = $false
+            primaryApprovers                = $ApprovalSettings.SecondStageApprovers
         }
     }
 
@@ -497,7 +522,8 @@ function Add-PolicyToAccessPackage {
             Write-Host "⚠️ Policy already exists. Updating existing policy." -ForegroundColor Yellow
             $result = Set-MgBetaEntitlementManagementAccessPackageAssignmentPolicy -AccessPackageAssignmentPolicyId $existingPolicy.Id -BodyParameter $policyParams
             Write-Host "✅ Successfully updated policy for $RoleName." -ForegroundColor Green
-        } else {
+        }
+        else {
             Write-Host "✨ Creating new policy..." -ForegroundColor Yellow
             $result = New-MgBetaEntitlementManagementAccessPackageAssignmentPolicy -BodyParameter $policyParams
             Write-Host "✅ Successfully created new policy for $RoleName." -ForegroundColor Green
@@ -511,88 +537,92 @@ function Add-PolicyToAccessPackage {
     }
 }
 
-
 # Main script section
 
-Write-Host "🔮 Starting the magical process..."
+Write-Host "🧙‍♂️✨ Welcome to the Magical World of Entra ID Access Packages! ✨🧙‍♂️" -ForegroundColor Magenta
 
 # Import required modules
-Write-Host "🔮 Summoning PowerShell modules..."
+Write-Host "📚 Summoning the ancient tomes of PowerShell..." -ForegroundColor Cyan
 Import-Module Microsoft.Graph.Authentication
 Import-Module Microsoft.Graph.Beta.Identity.Governance
 Import-Module Microsoft.Graph.Identity.DirectoryManagement
 
 # Authenticate to Microsoft Graph
-Write-Host "🧙‍♂️ Authenticating to Microsoft Graph..."
+Write-Host "🔮 Channeling the mystical energies of Microsoft Graph..." -ForegroundColor Cyan
 Connect-MgGraph -Scopes "Directory.Read.All", "EntitlementManagement.ReadWrite.All"
 
-
-
 # Ensure required PIM roles are active
+Write-Host "🏰 Unlocking the gates to the admin kingdom..." -ForegroundColor Yellow
 if (Ensure-PimRolesActive -RequiredRoles @("Global Administrator", "Identity Governance Administrator")) {
-    Write-Host "All required roles are active or activation has been requested." -ForegroundColor Green
-} else {
-    Write-Host "Failed to ensure all required roles are active. Please check the output above for details." -ForegroundColor Red
+    Write-Host "🗝️ The gates are open! You now wield the power of the admins!" -ForegroundColor Green
+}
+else {
+    Write-Host "🚫 Alas! The magical keys were out of reach. Our quest ends here." -ForegroundColor Red
+    exit
 }
 
-
 $defaultCatalogName = "Entra ID Admin Roles"
-$catalogName = Read-Host "🔮 Enter the name of the catalog to create or update access packages for: [$defaultCatalogName]"
+$catalogName = Read-Host "🏷️ What shall we name our grand catalog of roles? [$defaultCatalogName]"
 if ([string]::IsNullOrEmpty($catalogName)) {
     $catalogName = $defaultCatalogName
 }
 $catalog = Get-OrCreateCatalog -CatalogName $catalogName
 
-
-# Get all Directory roles
-Write-Host "📜 Gathering all Directory roles..."
-$directoryRoles = Get-MgDirectoryRole -All | Where-Object { $null -ne $_.RoleTemplateId }
+# Get all Directory roles, excluding Global Administrator
+Write-Host "📜 Unrolling the ancient scroll of Directory roles..." -ForegroundColor Cyan
+$directoryRoles = Get-MgDirectoryRole -All | Where-Object { 
+    $null -ne $_.RoleTemplateId -and 
+    $_.DisplayName -ne "Global Administrator" -and 
+    $_.DisplayName -ne "Company Administrator"
+}
+Write-Host "🎭 Behold! We've discovered $($directoryRoles.Count) mystical roles!" -ForegroundColor Green
 
 # Select the cloud admin group
+Write-Host "☁️ Now, let's find the keepers of the cloud..." -ForegroundColor Yellow
 $cloudAdminGroup = Select-Group
-Write-Host "✅ Selected Cloud Admin Group: $($cloudAdminGroup.DisplayName)"
+Write-Host "👑 The chosen ones: $($cloudAdminGroup.DisplayName)" -ForegroundColor Green
+
 # Get all enabled Entra ID users
-
-Write-Host "👥 Fetching all enabled Entra ID users..."
+Write-Host "🧑‍🤝‍🧑 Summoning all the active users in the realm..." -ForegroundColor Cyan
 $entraIDUsers = Get-MgUser -Filter "AccountEnabled eq true" -All | Select-Object DisplayName, Id
-
+Write-Host "🎉 $($entraIDUsers.Count) brave souls answered the call!" -ForegroundColor Green
 
 # Get approval settings once
+Write-Host "⚖️ Time to set the rules of engagement..." -ForegroundColor Yellow
 $approvalSettings = Get-ApprovalSettings -EntraIDUsers $entraIDUsers
 
 # Get access review settings once
+Write-Host "🔍 And now, for the grand inspection ritual..." -ForegroundColor Yellow
 $accessReviewSettings = Get-AccessReviewSettings -EntraIDUsers $entraIDUsers
 
-# Add each role to the catalog
-foreach ($role in $directoryRoles) {
-    Write-Host "✨ Adding role $($role.DisplayName) to catalog..."
-    Add-EntraRoleToCatalog -CatalogId $catalog.Id -Role $role
-}
-
 # Add each role to the catalog and create access packages
+Write-Host "🎨 Painting our masterpiece of access management..." -ForegroundColor Magenta
 foreach ($role in $directoryRoles) {
     $roleName = $role.DisplayName
-    Write-Host "🔮 Processing access package for role: $roleName"
+    Write-Host "🎭 Weaving the tale of $roleName..." -ForegroundColor Cyan
 
     try {
-        Write-Host "✨ Adding role $($role.DisplayName) to catalog..."
+        Write-Host "✨ Adding a sprinkle of $roleName to our magical catalog..."
         Add-EntraRoleToCatalog -CatalogId $catalog.Id -Role $role
 
         $accessPackage = Get-OrCreateAccessPackage -RoleName $roleName -CatalogId $catalog.Id -RoleId $role.RoleTemplateId
         
-        # Add role scope to the access package
+        Write-Host "🔓 Unlocking the secrets of $roleName..."
         Add-RoleScopeToAccessPackage -AccessPackageId $accessPackage.Id -Role $role -CatalogId $catalog.Id
 
-        # Add policy to the access package
+        Write-Host "📜 Inscribing the ancient laws for $roleName..."
         Add-PolicyToAccessPackage -AccessPackageId $accessPackage.Id -RoleName $roleName -GroupId $cloudAdminGroup.Id -ApprovalSettings $approvalSettings -AccessReviewSettings $accessReviewSettings
     }
     catch {
-        Write-Host "❌ Failed to process access package for "$roleName": $_" -ForegroundColor Red
+        Write-Host "💥 Alas! The spell for $roleName fizzled: $_" -ForegroundColor Red
     }
 }
 
-Write-Host "🏁 Process completed. Access packages have been created or updated for all Directory roles in the '$catalogName' catalog."
+Write-Host "🎊 Huzzah! Our grand opus of access packages is complete! 🎊" -ForegroundColor Green
+Write-Host "The tomes of '$catalogName' now hold the secrets to all Directory roles." -ForegroundColor Cyan
 
 # Disconnect from Microsoft Graph
-Write-Host "🔌 Disconnecting from Microsoft Graph..."
+Write-Host "👋 Bidding farewell to the mystical realms of Microsoft Graph..." -ForegroundColor Yellow
 Disconnect-MgGraph
+
+Write-Host "🌟 Your journey through the Entra ID wonderland is complete! May your access packages bring order to the chaos! 🌟" -ForegroundColor Magenta
