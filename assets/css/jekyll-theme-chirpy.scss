@@ -1,0 +1,356 @@
+---
+---
+
+@import "main";
+
+/* append your custom style below */
+
+@mixin x_ite-dark-scheme {
+  --system-red: rgb(0, 120, 215); /* Azure equivalent of red, more like a primary azure */
+  --system-yellow: rgb(75, 175, 220); /* Lighter azure for a yellow substitute */
+  --system-blue: rgb(0, 163, 224); /* Bright azure */
+  --system-green: rgb(72, 202, 228); /* Cyan, a greenish azure */
+  
+  /* Navigation Colors - adjusted for an azure theme */
+  --nav-border-color: rgba(100, 149, 237, 0.17); /* Cornflower blue, soft border */
+  --nav-active-page: rgb(100, 181, 246); /* Light azure */
+  
+  /* Heading Colors - transitioning to azure and cool tones */
+  --h1-color: rgb(10, 72, 155); /* Deep sky blue, vibrant for H2 */
+  --h2-color: rgb(0, 191, 255); /* Deep sky blue, vibrant for H2 */
+  --h3-color: rgb(70, 130, 180); /* Steel blue, cooler for H3 */
+  --h3-color-strong: rgb(135, 206, 250); /* Light sky blue, lighter for emphasis */
+  --h4-color: rgb(30, 144, 255); /* Dodger blue, strong for H4 */
+  --h4-color-strong: rgb(173, 216, 230); /* Light blue, soft for strong H4 */
+  
+  /* Background and Utility Colors - keeping with the azure and cool theme */
+  --example-background-color: rgba(225, 245, 254, 0.471); /* Very light azure, for backgrounds */
+  --button-background-color: rgb(0, 123, 255); /* Vivid azure for buttons */
+  
+  --playground-toolbar-color: rgba(70, 130, 180, 0.7); /* Steel blue, for toolbar */
+  --playground-editor-background: rgba(225, 245, 254, 0.2); /* Very light azure, for editor background */
+}
+
+@mixin x_ite-light-scheme {
+  --system-red: rgb(135, 206, 235); /* Light Azure for red */
+  --system-yellow: rgb(173, 216, 230); /* Pale Azure for yellow */
+  --system-blue: rgb(176, 224, 230); /* Powder Blue, softer azure */
+  --system-green: rgb(144, 195, 212); /* Sky Blue, greenish azure */
+
+  --h2-color: rgb(135, 206, 250); /* Light sky blue for H2 */
+  --h3-color: rgb(100, 149, 237); /* Cornflower blue for H3 */
+  --h3-color-strong: rgb(70, 130, 180); /* Steel blue for strong H3 */
+  --h4-color: rgb(173, 216, 230); /* Pale Azure for H4 */
+  --h4-color-strong: rgb(135, 206, 235); /* Light Azure for strong H4 */
+
+  --example-background-color: rgba(240, 248, 255, 0.644); /* Alice Blue, very light azure */
+  --button-background-color: rgb(176, 224, 230); /* Powder Blue for buttons */
+
+  --playground-toolbar-color: rgba(173, 216, 230, 0.7); /* Pale Azure for toolbar */
+  --playground-editor-background: rgba(240, 248, 255, 0.7); /* Alice Blue, light azure for editor */
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-mode]), html[data-mode=dark] {
+    @include x_ite-dark-scheme;
+  }
+
+  html[data-mode=light] {
+    @include x_ite-light-scheme;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  html[data-mode=dark] {
+    @include x_ite-dark-scheme;
+  }
+
+  html:not([data-mode]), html[data-mode=light] {
+    @include x_ite-light-scheme;
+  }
+}
+
+@media all and not (max-width: 1199px) {
+  .post-tail-wrapper > .nav-wrapper {
+    display: none;
+  }
+}
+
+/* append your custom style below */
+
+.red {
+  color: var(--system-red) !important;
+}
+
+.green {
+  color: var(--system-green) !important;
+}
+
+.blue {
+  color: var(--system-blue) !important;
+}
+
+.yellow {
+  color: var(--system-yellow) !important;
+}
+
+#topbar-title {
+  text-transform: uppercase;
+}
+
+.nav-wrapper {
+  border-left: 1px solid var(--nav-border-color);
+  margin-bottom: 4rem;
+  transition: top 0.2s ease-in-out;
+  -webkit-animation: fade-up 0.8s;
+  animation: fade-up 0.8s;
+}
+
+.nav-wrapper a.active {
+  color: var(--nav-active-page);
+}
+
+.content h1 {
+  color: var(--h1-color);
+  font-weight: bold;
+}
+
+.content h2 {
+  color: var(--h2-color);
+}
+
+.content h3 {
+  color: var(--h3-color);
+}
+
+.content h3 strong {
+  color: var(--h3-color-strong);
+}
+
+.content h4 {
+  color: var(--h4-color);
+}
+
+.content h4 strong {
+  color: var(--h4-color-strong);
+}
+
+.content h5 {
+  font-weight: bold;
+}
+
+.content dl dt {
+  color: var(--h3-color-strong);
+}
+
+.clear {
+  clear: both;
+}
+
+small, .small {
+  font-size: 75%;
+}
+
+.content x3d-canvas,
+
+.content iframe {
+  border: none;
+  width: 100%;
+  height: 23em;
+  font-family: 'JetBrainsMono Nerd Font', monospace;
+}
+
+.content x3d-canvas.teaser {
+  aspect-ratio: 16 / 5;
+}
+
+.table-wrapper > table tbody tr td,
+.table-wrapper > table thead th {
+  white-space: initial;
+}
+
+/* table examples */
+
+.table-wrapper > table.examples tbody tr {
+  border: none;
+  background-color: var(--tb-odd-bg);
+}
+
+.table-wrapper > table.examples tbody tr td {
+  border: 3px solid var(--tb-odd-bg);
+  padding: 0;
+}
+
+.table-wrapper > table.examples a.img-link {
+  position: relative;
+  display: block;
+}
+
+.table-wrapper > table.examples a.popup {
+  margin: 0;
+}
+
+@media all and (max-width: 849px) {
+  .table-wrapper > table.examples tbody tr td {
+    border-width: 2px;
+  }
+}
+
+@media all and (max-width: 576px) {
+  .table-wrapper > table.examples tbody tr td {
+    border-width: 1px;
+  }
+}
+
+
+/* Custom styles */
+@font-face {
+    font-family: 'JetBrainsMono Nerd Font';
+    src: url('/assets/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+code, kbd, pre, samp {
+  font-family: 'JetBrainsMono Nerd Font';
+  font-size: 1em;
+}
+
+.highlight pre {
+  margin-bottom: 0;
+  font-size: 1rem;
+  line-height: 1.4rem;
+  word-wrap: normal;
+}
+
+.highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
+.highlight {
+  color: #7FDBFF; /* Light Azure for text */
+  background-color: #011627; /* Deep Azure for background */
+}
+.highlight .gl {
+  color: #1F618D; /* Darker Azure */
+  background-color: #151515; /* Dark Grayish Azure */
+}
+.highlight .gp {
+  color: #85C1E9; /* Soft Azure */
+  font-weight: bold;
+}
+.highlight .c, .highlight .ch, .highlight .cd, .highlight .cm, .highlight .cpf, .highlight .c1, .highlight .cs {
+  color: #3498DB; /* Bright Azure */
+  font-style: italic;
+}
+.highlight .n {
+  color: #2c7da0; /* Aqua */
+  font-weight: bold;
+}
+.highlight .cp {
+  color: #48C9B0; /* Aqua */
+  font-weight: bold;
+}
+.highlight .err {
+  color: #ECF0F1; /* Very light gray for contrast */
+  background-color: #2980B9; /* Error in Azure */
+}
+.highlight .gr {
+  color: #A569BD; /* Soft Purple */
+  font-weight: bold;
+  font-style: italic;
+}
+.highlight .k, .highlight .kd, .highlight .kv {
+  color: #5499C7; /* Calm Blue */
+  font-weight: bold;
+}
+.highlight .o, .highlight .ow {
+  color: #45B39D; /* Sea Green */
+  font-weight: bold;
+}
+.highlight .p, .highlight .pi {
+  color: #5DADE2; /* Light Blue */
+}
+
+
+.highlight .gd {
+  color: #154360; /* Darker Blue for deleted code */
+}
+.highlight .gi {
+  color: #AED6F1; /* Lighter Blue for inserted code */
+}
+.highlight .ge {
+  font-style: italic;
+}
+.highlight .gs {
+  font-weight: bold;
+}
+.highlight .gt {
+  color: #1F618D; /* Darker Azure */
+  background-color: #2E4053; /* Dark Grayish Azure */
+}
+.highlight .kc, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .gh, .highlight .gu {
+  color: #3498DB; /* Bright Azure for control keywords */
+  font-weight: bold;
+}
+.highlight .kt {
+  color: #5DADE2; /* Light Blue for data types */
+  font-weight: bold;
+}
+.highlight .no, .highlight .nc, .highlight .nd, .highlight .nn, .highlight .bp, .highlight .ne, .highlight .nl, .highlight .nt {
+  color: #85C1E9; /* Soft Azure for namespace, class, decorator */
+  font-weight: bold;
+}
+.highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo, .highlight .mx {
+  color: #7FB3D5; /* Medium Azure for numbers */
+  font-weight: bold;
+}
+.highlight .ld {
+  color: #7FB3D5; /* Medium Azure for string delimiter */
+  font-weight: bold;
+}
+.highlight .ss {
+  color: #7FB3D5; /* Medium Azure for secondary strings */
+  font-weight: bold;
+}
+.highlight .s, .highlight .sb, .highlight .dl, .highlight .sd, .highlight .s2, .highlight .sh, .highlight .sx, .highlight .sr, .highlight .s1 {
+  color: #D6EAF8; /* Very Light Blue for strings */
+  font-weight: bold;
+}
+.highlight .sa {
+  color: #5499C7; /* Calm Blue for attribute */
+  font-weight: bold;
+}
+.highlight .se {
+  color: #48C9B0; /* Aqua for end tag */
+  font-weight: bold;
+}
+.highlight .sc {
+  color: #48C9B0; /* Aqua for character */
+  font-weight: bold;
+}
+.highlight .si {
+  color: #48C9B0; /* Aqua for interpolation */
+  font-weight: bold;
+}
+.highlight .nb {
+  font-weight: bold;
+}
+.highlight .ni {
+  color: #85C1E9; /* Soft Azure for special identifier */
+  font-weight: bold;
+}
+.highlight .w {
+  color: #AED6F1; /* Light Blue for whitespace */
+}
+.highlight .go {
+  color: #AED6F1; /* Light Blue for go directive */
+}
+.highlight .nf, .highlight .fm {
+  color: #3498DB; /* Bright Azure for function name/method call */
+}
+.highlight .py {
+  color: #3498DB; /* Bright Azure for Python */
+}
+.highlight .na, .highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi, .highlight .vm {
+  color: #01cfff; /* Light Blue for variable, class name, etc. */
+  font-weight: bold;
+}
