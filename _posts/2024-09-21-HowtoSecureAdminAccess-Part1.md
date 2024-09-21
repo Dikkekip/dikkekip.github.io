@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "🚀 How to Secure Admin Access! - Part 1"
+title:  "🛡️ How to Secure Admin Access! - Part 1"
 date:   2024-09-24 07:40:59 +0100
 comments: true
-description: "**Securing Admin Access** in **Microsoft Entra ID*"
+description: "Securing Admin Access in Microsoft Entra ID"
 categories: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
 tags: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
 image:
