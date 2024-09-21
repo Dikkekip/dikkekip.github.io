@@ -3,7 +3,7 @@ layout: post
 title:  "How to Secure Admin Access! - Part 2"
 date:   2024-09-21 10:00:00 +0530
 comments: true
-description: "Securing Admin Access in Microsoft Entra ID: Phishing-Resistant Authentication, Token Protection, and More!"
+description: "Automating Persona-Based Conditional Access Policies"
 categories: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
 tags: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure]
 image:
