@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "How to Secure Admin Access! - Part 1"
+title:  "How to Secure Admin Access! - Part 2"
 date:   2024-09-21 10:00:00 +0530
 comments: true
 description: "Securing Admin Access in Microsoft Entra ID: Phishing-Resistant Authentication, Token Protection, and More!"
@@ -11,253 +11,274 @@ image:
   src: /assets/img/1725962735025.gif
 toc: true
 ---
-
-
-## Fortify Your Castle: How to Secure Admin Access with Phishing-Resistant Authentication and Token Protection
-
-Hello, fellow tech enthusiasts! 🎉 As we celebrate our **Microsoft Identity and Access Management Specialization renewal** at Devoteam, I thought it would be the perfect time to dive into a topic that's been buzzing in the IT corridors lately: **Securing Admin Access** in **Microsoft Entra ID**.
-
-Imagine you're the ruler of a vast kingdom (your organization), and you've built towering walls (firewalls), installed drawbridges (VPNs), and hired the best guards (antivirus software). But somehow, pesky invaders (cyber attackers) still find a way in! How? Well, it's time we talk about **phishing-resistant authentication**, **token theft**, and how to truly **fortify your castle**.
-
-So grab a cup of your favorite brew ☕, and let's embark on this security adventure together!
-
-
-### The Evolving Threat Landscape: Why Phishing-Resistant Authentication Isn’t Enough
-
-First off, let's address the elephant in the room. Phishing attacks have become more sophisticated, and traditional passwords are as outdated as a medieval catapult in modern warfare.
-
-Enter **Passkeys**, **FIDO2 keys**, and **Windows Hello for Business (WHfB)**—our shiny new armor. These **phishing-resistant** methods are fantastic. They eliminate passwords and ensure only the intended user can authenticate. For Global Admins or Security Admins, these are *must-haves*. After all, we wouldn't want the keys to the kingdom falling into the wrong hands, would we?
-
-But here's where the plot thickens: **Token Theft**.
-
-Even with these robust methods, attackers have found sneaky ways to bypass defenses. It's like having a moat filled with crocodiles but forgetting about the secret tunnel underneath. Attackers use malware and advanced tactics like **Adversary-in-the-Middle (AiTM)** attacks to steal authentication tokens, granting them the same access as legitimate users.
-<!-- markdownlint-capture -->
-<!-- markdownlint-disable -->
-> **Real-World Scenario**: Microsoft's incident response team uncovered cases where attackers installed malware on admin devices, stealing tokens and gaining unauthorized access—all without triggering traditional security alarms.
-{: .prompt-danger }
-<!-- markdownlint-restore -->
-### Entra ID OAuth Tokens: A Brief Overview
-
-**Entra ID OAuth tokens** are crucial for handling authentication and authorization in cloud environments. These tokens come in different types:
-
-1. **ID Tokens**: Used for authentication, proving the user’s identity. Valid for 1 hour.
-2. **Access Tokens**: Used for authorization, granting access to resources. Also valid for 1 hour.
-3. **Refresh Tokens**: Used to obtain new access tokens without re-authentication, valid for up to 90 days.
-
-Among these, **Primary Refresh Tokens (PRT)** and **Family of Refresh Tokens (FRT)** are particularly powerful. PRTs are essential for Single Sign-On (SSO) and provide persistent access across resources, while FRTs allow access across multiple applications. This makes them valuable targets for attackers in token-based attacks. Stolen tokens can be used to bypass security controls like Conditional Access.
-
-Ensuring robust **token management** and security through **phishing-resistant MFA** and **Conditional Access policies** is critical to protecting your organization's resources from unauthorized access. For more details, you can refer to the full breakdown [here](https://www.xintra.org/blog/tokens-in-entra-id-guide/).	
-
 ---
 
-### Continuous Access Evaluation: Your Real-Time Defense Shield 🛡️
+## How to Secure Admin Access - Part 2: Automating Persona-Based Conditional Access Policies 🛡️✨
 
-**Continuous Access Evaluation (CAE)** enhances security by enabling **real-time** token validation, allowing tokens to be revoked immediately when critical changes occur—such as a password reset, account compromise, or network location shift. This dynamic validation makes it harder for attackers to misuse stolen tokens.
+Welcome back, fellow IT wizards 🧙‍♂️🧙‍♀️, to our magical journey of securing admin access! In **Part 1**, we ventured into the realms of **Admin Access** and set the foundations for a secure kingdom. This time, we're diving into **Persona-Based Conditional Access Policies**—essentially enchanted wards 🧙‍♂️🔮 tailored to different roles within your organization. Instead of casting a generic **Protego Totalum** 🛡️ over everyone, we're going to fine-tune our spells (ahem, policies) based on role, access requirements, and risk levels.
 
-#### What Is CAE?
+For example, your mighty **Global Administrator** (think **Dumbledore of Entra ID**) needs stricter security enchantments than an average user just accessing coffee orders ☕📋.
 
-Unlike the standard one-hour token expiration, CAE ensures tokens are re-evaluated when necessary. It creates a continuous conversation between **Microsoft Entra ID** and services like **Exchange Online**, **Teams**, and **SharePoint Online**, enabling immediate action on security risks.
+### Why Persona-Based Policies Matter ⚖️
 
-#### Benefits of CAE
+Not everyone in your organization needs the power of a **Nimbus 2000** 🧹. Some users, like HR employees handling sensitive data 🗂️, require extra protection, but it's nothing compared to what your **Global Administrators** need. That's where persona-based policies come in. Like casting a **Lumos** 💡 that’s bright enough to guide you but doesn’t blind anyone, these policies balance security and usability.
 
-- **Real-time response**: Tokens are dynamically updated in response to events like password changes or location changes, revoking access when conditions change.
-- **Network enforcement**: Integrates with **Conditional Access policies** to block tokens used from untrusted networks, reducing the risk of token replay attacks.
+With these, you can require extra steps (think of MFA as a **magic incantation** 🧩) for high-risk users, while others breeze through securely. 🔐
 
-#### Where CAE Works—and Where It Doesn’t
+### Persona Breakdown 🧙‍♂️📜
 
-While CAE supports **Exchange Online**, **Teams**, and **SharePoint Online**, it **cannot protect Tier-0 admin accounts** effectively because these accounts typically don’t use email or communication services. **Admin accounts** are often best-practice configured with **phishing-resistant MFA** but, once authenticated, the session token is valid for up to an hour, leaving potential vulnerability post-authentication.
+In the realm of Conditional Access, users fit into different personas, each getting a specific set of security spells tailored to their role:
 
-To secure **Tier-0** resources and **admin accounts**, CAE must be used in combination with **Privileged Access Workstations (PAWs)**, **Conditional Access policies**, and **phishing-resistant MFA**. These measures ensure that even if a token is stolen, other layers of defense are in place.
+- **ca-persona-admins**: High-privilege admins needing **phishing-resistant MFA** 🛡️ (you don’t want your castle walls breached by a simple charm 🧙‍♂️).
+- **ca-persona-global**: Global protection 🏰—applied universally to everyone. This is your foundation spell!
+- **ca-persona-externals**: External contractors 🧳 with limited access, bounded by specific application policies 🔐.
+- **ca-persona-guests**: Guests 🎓 (visiting from another realm) with light security and restricted resource access.
+- **ca-persona-internals**: Regular employees 🧑‍💼 needing moderate protection (MFA) for day-to-day applications.
+- **ca-persona-guestadmins**: Guests granted temporary **admin powers** 🏆 (think students borrowing a professor's wand), requiring **Protego Maxima** 🛡️🛡️.
+- **ca-persona-developers**: Developers 🧑‍💻 working with sensitive environments 🔮, needing strict device compliance and MFA.
+- **ca-persona-serviceaccounts**: Service accounts 🤖 requiring special protections like **managed identities** and token policies. (You don’t want these going rogue, like a Niffler chasing shiny tokens ✨🦡.)
 
-#### The Future of CAE
+### The Magical Framework from Claus Jespersen 🧙‍♂️💻
 
-CAE is a valuable layer in modern security strategies, and as it expands to cover more services, it will play an even more critical role in protecting environments. However, for now, **admin access** requires a mix of CAE and other advanced measures to fully protect high-value accounts.
+Claus Jespersen and his brilliant team have provided an excellent guide for implementing these persona-based policies. They crafted the **Conditional Access Framework**, built on **Zero Trust principles**, and it’s an absolute game-changer 🔐. This framework uses a clear naming convention for different personas, helping you manage policies and avoid potential conflicts.
 
-For more information, visit [CAE strict enforcement](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-continuous-access-evaluation-strict-enforcement).
+Claus's work includes an invaluable **[Excel Workbook](https://github.com/microsoft/ConditionalAccessforZeroTrustResources/raw/main/ConditionalAccessSamplePolicies/Microsoft%20Conditional%20Access%20for%20Zero%20trust%20persona%20based%20policies.xlsx)**, which provides a template for persona-based Conditional Access policies. Alongside this, the **[PDF guide](https://github.com/microsoft/ConditionalAccessforZeroTrustResources/blob/main/ConditionalAccessGovernanceAndPrinciplesforZeroTrust%20October%202023.pdf)** explains the governance and principles in great detail.
 
----
+**Huge kudos to Claus** for making it easy to implement this in the real world! 🎉🔮
 
-### Strengthening Your Defenses: Compliant Devices and Windows Hello for Business
+### Automating Persona Creation with PowerShell 🪄💻
 
-Imagine if every guard entering your castle had to pass a rigorous health check. That's what **compliant device policies** do—they ensure only devices meeting your security standards can access your resources.
+Managing security spells (oops, I mean policies) can be time-consuming. Here’s where a bit of automation magic via PowerShell ⚡💻 can save the day. Below is a spell (aka script 🧑‍💻) that automates the creation of security groups for your personas.
 
-**Windows Hello for Business (WHfB)** is like giving each guard a unique, unforgeable badge:
+#### PowerShell Script for Creating Security Groups ⚙️
 
-- **Passwordless Authentication**: Say goodbye to passwords!
-- **Multi-Factor Authentication**: Combines device possession with biometrics or PIN.
-- **Hardware-Based Security**: Credentials are stored securely on the device.
+You can find the script here: [Create-groups.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-groups.ps1)
 
-By combining WHfB with compliant device policies, we ensure that only **trusted knights on trusted steeds** enter our realm. This also protects against **Adversary-in-the-Middle (AiTM)** attacks, as credentials cannot be intercepted or replayed.
+![Screenshot](assets/img/SecuringAdminAccess/Screenshot%202024-09-21%20142118.png)
 
----
-
-### Compliant Network Checks: Keeping the Drawbridge Up 🏰
-
-Now, let's talk about controlling access points. **Compliant Network Checks** ensure that only devices connected via a **trusted network** can access your resources.
-
-Enter the **Global Secure Access Client**—our modern-day portcullis:
-
-- **Simplified Management**: No need to juggle IP addresses.
-- **Enhanced Security**: Only devices on your secure network gain access.
-- **Flexibility**: Ideal for remote work scenarios.
-
-By deploying this client, you add another layer of security. Even if a token is stolen, without access to your compliant network, attackers are left out in the cold.
-
-For a step-by-step guide, check out [Enable Compliant Network Check with Conditional Access](https://learn.microsoft.com/entra/global-secure-access/how-to-compliant-network#compliant-network-check-enforcement).
-
----
-
-### Privileged Access Workstations (PAWs): Your Secure Command Center 🖥️
-
-Think of **Privileged Access Workstations (PAWs)** as your secure war room—accessible only to the highest-ranking officials.
-
-**Why PAWs?**
-
-- **Dedicated Devices**: Used exclusively for administrative tasks.
-- **Hardened Security**: Enhanced settings and limited software.
-- **Isolated Network Access**: Reduces exposure to threats.
-
-By isolating admin activities, you minimize risks. It's like discussing battle plans in a soundproof room rather than a crowded tavern.
-
----
-
-### Persona-Based Authentication: Custom Armor for Every Role 🛡️
-
-Not all your subjects need the same level of protection. A blacksmith doesn't need the king's guard detail, right?
-
-**Persona-Based Authentication** allows you to tailor authentication methods and policies to different user roles based on their risk profiles.
-
-#### What is Persona-Based Authentication?
-
-It's a strategy where you define personas—groups of users with similar roles or security requirements—and assign appropriate authentication methods and policies to each.
-
-- **High-Risk Roles**: Require stronger authentication methods.
-By customizing authentication methods and policies per persona, you strike the right balance between security and usability.
-
-#### Benefits of Persona-Based Authentication
-
-- **Enhanced Security**: High-risk roles get stronger authentication methods.
-- **Improved User Experience**: Users don't face unnecessary hurdles.
-- **Regulatory Compliance**: Meet specific compliance requirements for certain roles.
-- **Adaptability**: Quickly adjust policies as roles and threats evolve.
-
-#### Implementing Persona-Based Authentication
-
-1. **Identify Personas**: Group users based on roles, responsibilities, and security needs.
-
-2. **Define Authentication Methods**:
-
-   - **High-Risk Roles**: Use phishing-resistant methods like FIDO2 or WHfB.
-   - **Standard Users**: Use MFA methods like Authenticator app or SMS (though SMS is less secure).
-
-3. **Configure Conditional Access Policies**:
-
-   - Assign policies to each persona.
-   - Set conditions and controls appropriate for each group.
-
-4. **Communicate and Train**:
-
-   - Inform users about new authentication methods.
-   - Provide training resources and support.
-
-5. **Monitor and Adjust**:
-
-   - Regularly review authentication logs.
-   - Adjust policies based on emerging threats or organizational changes.
-
-6. **Leverage Entra ID Authentication Strengths**:
-
-   - Use authentication strengths in Conditional Access to specify required authentication methods for accessing resources.
-
----
-
-### Bringing It All Together: Your Security Blueprint 📜
-
-Let's recap our master plan to secure the realm:
-
-1. **Phishing-Resistant Authentication**:
-
-   - Deploy FIDO2 keys, Passkeys, or WHfB.
-   - Shield against credential theft and AiTM attacks.
-
-2. **Compliant Device Policies**:
-
-   - Ensure devices meet security standards.
-   - Reduce malware risks.
-
-
-4. **Compliant Network Checks**:
-
-   - Use the Global Secure Access Client.
-   - Limit access to trusted networks.
-
-5. **Privileged Access Workstations (PAWs)**:
-
-   - Isolate admin tasks on secure devices.
-   - Minimize token theft risks.
-
-7. **Persona-Based Authentication**:
-
-   - Tailor authentication methods and policies to user roles.
-   - Balance security with usability.
-
-By layering these defenses, you're not just building a wall—you're creating an impenetrable fortress.
-
----
-
-### Final Thoughts: Stay One Step Ahead 🚀
-
-Cybersecurity isn't a destination; it's a journey. Threats evolve, but so do our defenses. By staying informed and proactive, you ensure your castle remains unbreached.
-
-Remember, in the words of a wise strategist: *"The best offense is a good defense."* So let's keep our shields up and our wits sharper!
 
 <!-- markdownlint-capture -->
 <!-- markdownlint-disable -->
-> **⚠️ Pro Tip**: Always keep a **break-glass account** handy! I've been there—locked out of my tenant while setting up MFA. *Spoiler alert: it wasn't fun.* 🙃
-{: .prompt-warning }
-<!-- markdownlint-restore -->
+> **Note**: Due to the script's length, please refer to the script at the provided link.
+{: .prompt-info }
+<!-- markdownlint-restore --> Due to the script's length, please refer to the script at the provided link.
+
+
+```powershell
+# PowerShell script content
+# Due to length, please refer to the script at the provided link.
+
+function Get-ValidMailNickname {
+    param (
+        [string]$DisplayName
+    )
+    # Remove any non-alphanumeric characters and replace spaces with underscores
+    $mailNickname = $DisplayName -replace '[^\w\-]', '' -replace '\s', '_'
+    
+    # Truncate to 64 characters if longer
+    if ($mailNickname.Length -gt 64) {
+        $mailNickname = $mailNickname.Substring(0, 64)
+    }
+    
+    return $mailNickname.ToLower()
+}
+
+function New-AADGroup {
+    param (
+        [string]$DisplayName,
+        [string]$Description,
+        [bool]$SecurityEnabled,
+        [bool]$MailEnabled,
+        [string[]]$GroupTypes,
+        [string]$MembershipRule,
+        [string]$MembershipRuleProcessingState
+    )
+
+    # Function content continues...
+}
+
+# Connect to Microsoft Graph if not already connected
+if (-not (Get-MgContext)) {
+    try {
+        Connect-MgGraph -Scopes "Group.ReadWrite.All" -ErrorAction Stop
+        Write-Host "Connected to Microsoft Graph successfully." -ForegroundColor Green
+        Log-Message "Connected to Microsoft Graph successfully."
+    }
+    catch {
+        Write-Host "Failed to connect to Microsoft Graph. Error: $_" -ForegroundColor Red
+        Log-Message "Failed to connect to Microsoft Graph. Error: $_"
+        exit
+    }
+}
+
+# Define the groups to create
+# Left out because of length
+
+foreach ($group in $groups) {
+    New-AADGroup @group
+}
+```
+
+This PowerShell script helps you create persona-based security groups for **admins**, **service accounts**, and **guests** from distant lands 🌍. Customize group types and membership rules to fit your unique wizarding (or organizational) needs 🏰✨.
+
+### Creating Admin and Break Glass Accounts 🧙‍♂️🔐
+
+Admins are like the **Masters of the Elder Wand** 🪄 in your organization—so they need extra layers of protection. Similarly, **Break Glass accounts** are your **emergency exit spells** 🧩, only used in dire situations when admin accounts might fail. The PowerShell script below ensures both types of accounts are secured with the proper magical safeguards 🛡️.
+
+The script automates the creation of Admin accounts and Break Glass accounts, setting them up with strong passwords (no **Alohomora** here!) and assigning them appropriate roles and permissions, including **Global Administrator role eligibility** through Privileged Identity Management (PIM).
+
+#### Admin Users Creation Script ⚙️
+
+For full details and to get the script, you can download it here: [Create-Users.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-Users.ps1)
+
+![Screenshot](assets/img/SecuringAdminAccess/Create-Users.png)
+
+#### Key Features of the Script:
+
+- **Complex Password Generation**: No basic "Expelliarmus" spells here. The script conjures complex passwords 🔐 using a mix of uppercase, lowercase, numbers, and special characters.
+- **Admin Account Creation**: Adds new admins, checks for existing accounts, and assigns them to the appropriate Conditional Access groups like **ca-persona-admins** 🛡️.
+- **Break Glass Accounts**: Creates or verifies up to two Break Glass accounts (BG1 and BG2), with secure passwords and limited access, acting as your last-resort safety net. Think of it as your magical emergency plan 💼🛑.
+- **Global Admin Eligibility**: Automatically assigns **Global Administrator** role eligibility via PIM—because we want our admins to wield their power responsibly 🏆.
+
+#### The **Break Glass** Effect 💼🛡️
+
+If your main admin accounts are locked out, Break Glass accounts are your fallback. This script ensures their **Global Admin** role is always accessible, even when regular systems falter. They’re like magical safeguards with minimal everyday usage, but they’ll save you when things get chaotic! 🛡️✨
+
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
+> **Note**: Due to the script's length, please refer to the script at the provided link.
+{: .prompt-info }
+<!-- markdownlint-restore --> Due to the script's length, please refer to the script at the provided link.
+
+```powershell
+# Function to generate a random string for Break Glass accounts
+function New-RandomString {
+    $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.ToCharArray()
+    -join (1..8 | ForEach-Object { $characters | Get-Random })
+}
+
+# Function to check if a user exists
+function Get-ExistingUser {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$UserPrincipalName
+    )
+
+    # Function content continues...
+}
+
+# Main script logic
+$choice = Read-Host "Create (A)dmin account or (B)reak Glass accounts? (A/B)"
+
+if ($choice -eq "A") {
+    $newUser = New-AdminAccount
+    if ($newUser) {
+        $isGlobalAdmin = Read-Host "Should this user be eligible for the Global Administrator role via PIM? (Y/N)"
+        if ($isGlobalAdmin -eq "Y") {
+            Assign-GlobalAdminRoleEligibility -UserId ([string]$newUser.Id)
+        }
+    }
+}
+elseif ($choice -eq "B") {
+    New-BreakGlassAccount
+}
+else {
+    Write-Host "Invalid choice. Please run the script again and choose A or B." -ForegroundColor Red
+    Log-Message "Invalid choice entered: $choice"
+}
+```
+
+### Automating Conditional Access Policies (No Marauder’s Map Needed) 🗺️
+
+Now that your security groups are conjured and the Admin and Break Glass accounts are safely created, it’s time to automate those Conditional Access policies 🎯. But alas, we face some challenges! While we want admins to use **Phishing Resistant Tokens** (our most powerful protection spells 🪄), we also need a way for them to register their **FIDO2 keys** (because Passkeys are no ordinary charms 🔑).
+
+The first hurdle: our **MFA campaign** doesn’t support asking for Passkeys/FIDO keys right away. So, we need a workaround to let admins use MFA or **Tap to Sign In** temporarily while they register their FIDO2 keys.
+
+#### How to Solve This Conundrum 🧩
+
+Instead of excluding these admins from our **Phishing Resistant** policy forever (that’s like leaving Hogwarts unprotected 🏰), we’ll create an **alternative authentication strength** for initial MFA. This allows first-time use with a manageable authentication method, and then users can register their FIDO2 keys or Passkeys via the authenticator app. Learn more about this in **Microsoft's guide on [Authentication Strength](https://learn.microsoft.com/en-gb/entra/identity/authentication/concept-authentication-strengths)**.
+
+![Screenshot](assets/img/SecuringAdminAccess/authenticationStrengths.png)
+
+#### Pro Tip:
+
+> **⚠️ Always keep a Break Glass account handy!** Configuring Conditional Access with code can be dangerous. Thankfully, this script creates policies without enabling them immediately. Consider it your safety net (or **Protego charm** 🛡️) before you apply the real protection! 🙃
+
+### Key Conditional Access Policies for Admin Protection 🛡️
+
+By leveraging **phishing-resistant** authentication (like FIDO2), **MFA**, and **session policies**, you establish secure, targeted access control for various apps and platforms. Some of the key policy types you’ll want to automate include:
+
+- **Base Protection**: A general layer of security for all personas.
+- **Identity Protection**: Risk-based sign-in protection.
+- **Data and App Protection**: Enforce security on mobile platforms.
+- **Attack Surface Reduction**: Prevent risky or unknown devices and platforms from accessing resources.
+
+This structured approach ensures robust security across multiple layers, allowing your admins to work securely while gradually shifting them to the most secure authentication methods.
+
+### Automating Conditional Access Policies with PowerShell 🧙‍♂️🔮
+
+This spell automatically creates and applies the right Conditional Access policies based on each persona 🎯. By automating the process, your admins, employees, and guests can safely navigate your secure environment without manually casting every protection spell. 🛡️🔒
+
+#### Conditional Access Creation Script ⚙️
+
+For full details and to get the script, you can download it here: [Create-CAPolicies.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPolicies.ps1)
+
+![Screenshot](assets/img/SecuringAdminAccess/Create-Ca.png)
+
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
+> **Note**: Due to the script's length, please refer to the script at the provided link.
+{: .prompt-info }
+<!-- markdownlint-restore --> Due to the script's length, please refer to the script at the provided link.
+
+```powershell
+# PowerShell script content
+# Due to length, please refer to the script at the provided link.
+
+# Define required modules
+$requiredModules = @("microsoft.graph.authentication", "microsoft.graph.identity.signins", "microsoft.graph.groups")
+
+# Function to create a conditional access policy
+function New-ConditionalAccessPolicy {
+    param (
+        [hashtable]$policyparams
+    )
+
+    New-MgIdentityConditionalAccessPolicy -BodyParameter $policyparams
+}
+
+$groups = Get-MgGroup -All | select displayname, id
+function Get-GroupIdByName {
+    param (
+        [string]$groupName,
+        [array]$groups
+    )
+    $group = $groups | Where-Object { $_.displayname -eq $groupName }
+    return $group.id
+}
+
+# Define the policy parameters
+# Left out because of length
+
+# Apply the policies
+foreach ($policy in $policies) {
+    # Function content continues...
+}
+
+# Disconnect from Microsoft Graph
+Disconnect-MgGraph
+```
+
+### Conclusion: Mastering the Security Spellbook 📜✨
+
+By leveraging **persona-based Conditional Access policies**, you ensure both a secure and user-friendly experience for your organization. And thanks to Claus Jespersen's framework 🧙‍♂️🔮, implementing these strategies has never been easier. Automating policies and groups with PowerShell ensures your defenses are consistently strong 🛡️, scaling effortlessly as your organization grows.
+
+Stay tuned for more chapters in this security spellbook, where we’ll continue to dive into the magic of security automation. Until then, may your spells be strong, your MFA tokens unbreakable, and your admins wise! 🔮✨
+
+**Accio Security!** 🧙‍♀️⚡
 
 ---
 
-### Additional Resources 📚
-
-- **Continuous Access Evaluation**:
-
-  - [Understanding CAE](https://learn.microsoft.com/azure/active-directory/conditional-access/concept-continuous-access-evaluation)
-  - [Implementing CAE](https://learn.microsoft.com/azure/active-directory/conditional-access/howto-continuous-access-evaluation)
-
-- **Compliant Network Check**:
-
-  - [Enable Compliant Network Check with Conditional Access](https://learn.microsoft.com/entra/global-secure-access/how-to-compliant-network#compliant-network-check-enforcement)
-
-- **Windows Hello for Business**:
-
-  - [Deployment Guide](https://learn.microsoft.com/windows/security/identity-protection/hello-for-business/hello-deployment-guide)
-
-- **Privileged Access Workstations**:
-
-  - [PAW Overview](https://learn.microsoft.com/security/compass/privileged-access-workstations)
-
-- **Persona-Based Authentication**:
-
-  - [Conditional Access Authentication Strengths](https://learn.microsoft.com/azure/active-directory/authentication/concept-authentication-strengths)
-  - [Plan a Conditional Access Deployment](https://learn.microsoft.com/azure/active-directory/conditional-access/plan-conditional-access)
-  - [Persona-Based Conditional Access](https://learn.microsoft.com/en-us/azure/architecture/guide/security/conditional-access-architecture)
-
----
-
-### What's Next? The Adventure Continues...
-
-Stay tuned for future posts where we'll delve deeper into implementing these strategies and share more insights on keeping your digital kingdom secure.
-
-So, polish your armor and ready your shields—the quest for ultimate security continues!
-
----
-
-Until next time—stay nerdy, stay secure, and may your tokens always be protected! 👨‍💻🔐
-
----
-
-**P.S.** Have any tales of your own security adventures? Share them in the comments below! Let's learn and grow together.
+Feel free to reach out if you have any questions or need further guidance on implementing these magical security measures. Until next time, keep your wands at the ready and your systems secure! 🪄🔐
 
 ---
