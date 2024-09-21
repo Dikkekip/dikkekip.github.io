@@ -34,22 +34,44 @@ Even with these robust methods, attackers have found sneaky ways to bypass defen
 
 > **Real-World Scenario**: Microsoft's incident response team uncovered cases where attackers installed malware on admin devices, stealing tokens and gaining unauthorized access—all without triggering traditional security alarms.
 
+### Entra ID OAuth Tokens: A Brief Overview
+
+**Entra ID OAuth tokens** are crucial for handling authentication and authorization in cloud environments. These tokens come in different types:
+
+1. **ID Tokens**: Used for authentication, proving the user’s identity. Valid for 1 hour.
+2. **Access Tokens**: Used for authorization, granting access to resources. Also valid for 1 hour.
+3. **Refresh Tokens**: Used to obtain new access tokens without re-authentication, valid for up to 90 days.
+
+Among these, **Primary Refresh Tokens (PRT)** and **Family of Refresh Tokens (FRT)** are particularly powerful. PRTs are essential for Single Sign-On (SSO) and provide persistent access across resources, while FRTs allow access across multiple applications. This makes them valuable targets for attackers in token-based attacks. Stolen tokens can be used to bypass security controls like Conditional Access.
+
+Ensuring robust **token management** and security through **phishing-resistant MFA** and **Conditional Access policies** is critical to protecting your organization's resources from unauthorized access. For more details, you can refer to the full breakdown [here](https://www.xintra.org/blog/tokens-in-entra-id-guide/).	
+
+---
 
 ### Continuous Access Evaluation: Your Real-Time Defense Shield 🛡️
 
-So, how do we fend off these cunning invaders? Meet **Continuous Access Evaluation (CAE)**—our vigilant watchtower that never sleeps.
+**Continuous Access Evaluation (CAE)** enhances security by enabling **real-time** token validation, allowing tokens to be revoked immediately when critical changes occur—such as a password reset, account compromise, or network location shift. This dynamic validation makes it harder for attackers to misuse stolen tokens.
 
-**CAE** provides near real-time token validation and policy enforcement. If it detects something fishy—like a token being used from an unexpected location—it can **immediately revoke that token**, shutting down any potential attacks faster than you can say "password123."
+#### What Is CAE?
 
-**Services Supported by CAE**:
+Unlike the standard one-hour token expiration, CAE ensures tokens are re-evaluated when necessary. It creates a continuous conversation between **Microsoft Entra ID** and services like **Exchange Online**, **Teams**, and **SharePoint Online**, enabling immediate action on security risks.
 
-- **Exchange Online**
-- **SharePoint Online**
-- **Microsoft Teams**
+#### Benefits of CAE
 
-This means your communication channels are guarded by CAE's ever-watchful eye.
+- **Real-time response**: Tokens are dynamically updated in response to events like password changes or location changes, revoking access when conditions change.
+- **Network enforcement**: Integrates with **Conditional Access policies** to block tokens used from untrusted networks, reducing the risk of token replay attacks.
 
-> **Note**: While CAE is powerful, it doesn't cover all services yet. So, we need to layer our defenses.
+#### Where CAE Works—and Where It Doesn’t
+
+While CAE supports **Exchange Online**, **Teams**, and **SharePoint Online**, it **cannot protect Tier-0 admin accounts** effectively because these accounts typically don’t use email or communication services. **Admin accounts** are often best-practice configured with **phishing-resistant MFA** but, once authenticated, the session token is valid for up to an hour, leaving potential vulnerability post-authentication.
+
+To secure **Tier-0** resources and **admin accounts**, CAE must be used in combination with **Privileged Access Workstations (PAWs)**, **Conditional Access policies**, and **phishing-resistant MFA**. These measures ensure that even if a token is stolen, other layers of defense are in place.
+
+#### The Future of CAE
+
+CAE is a valuable layer in modern security strategies, and as it expands to cover more services, it will play an even more critical role in protecting environments. However, for now, **admin access** requires a mix of CAE and other advanced measures to fully protect high-value accounts.
+
+For more information, visit [CAE strict enforcement](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-continuous-access-evaluation-strict-enforcement).
 
 ---
 
