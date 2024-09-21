@@ -31,9 +31,11 @@ Enter **Passkeys**, **FIDO2 keys**, and **Windows Hello for Business (WHfB)**—
 But here's where the plot thickens: **Token Theft**.
 
 Even with these robust methods, attackers have found sneaky ways to bypass defenses. It's like having a moat filled with crocodiles but forgetting about the secret tunnel underneath. Attackers use malware and advanced tactics like **Adversary-in-the-Middle (AiTM)** attacks to steal authentication tokens, granting them the same access as legitimate users.
-
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
 > **Real-World Scenario**: Microsoft's incident response team uncovered cases where attackers installed malware on admin devices, stealing tokens and gaining unauthorized access—all without triggering traditional security alarms.
-
+{: .prompt-danger }
+<!-- markdownlint-restore -->
 ### Entra ID OAuth Tokens: A Brief Overview
 
 **Entra ID OAuth tokens** are crucial for handling authentication and authorization in cloud environments. These tokens come in different types:
@@ -209,7 +211,11 @@ Cybersecurity isn't a destination; it's a journey. Threats evolve, but so do our
 
 Remember, in the words of a wise strategist: *"The best offense is a good defense."* So let's keep our shields up and our wits sharper!
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
 > **⚠️ Pro Tip**: Always keep a **break-glass account** handy! I've been there—locked out of my tenant while setting up MFA. *Spoiler alert: it wasn't fun.* 🙃
+{: .prompt-warning }
+<!-- markdownlint-restore -->
 
 ---
 
