@@ -52,7 +52,9 @@ Managing security spells (oops, I mean policies) can be time-consuming. Here’s
 
 #### PowerShell Script for Creating Security Groups ⚙️
 
-You can find the script here: [Create-groups.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-groups.ps1){:target="_blank"}
+You can find the script here:
+[Create-groups - Github](https://github.com/Dikkekip/dikkekip.github.io/blob/main/scripts/2024-07-29-SecuringAdminAccess/Create-groups.ps1){:target="_blank"}
+[Create-groups - RAW](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-groups.ps1){:target="_blank"}
 
 ![Screenshot](assets/img/SecuringAdminAccess/Screenshot%202024-09-21%20142118.png)
 
@@ -148,7 +150,7 @@ If your main admin accounts are locked out, Break Glass accounts are your fallba
 > **Note**: Due to the script's length, please refer to the script at the provided link.
 {: .prompt-info }
 <!-- markdownlint-restore --> Due to the script's length, please refer to the script at the provided link.
-For full details and to get the script, you can download it here: [Create-Users.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-Users.ps1){:target="_blank"}
+For full details and to get the script, you can download it here: [Create-Users - Github](https://github.com/Dikkekip/dikkekip.github.io/blob/main/scripts/2024-07-29-SecuringAdminAccess/Create-Users.ps1){:target="_blank"}[Create-Users - RAW](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-Users.ps1){:target="_blank"}
 
 ```powershell
 # Function to generate a random string for Break Glass accounts
@@ -230,7 +232,9 @@ This spell automatically creates and applies the right Conditional Access polici
 > **Note**: Due to the script's length, please refer to the script at the provided link.
 {: .prompt-info }
 <!-- markdownlint-restore --> 
-you can download it here: [Create-CAPolicies.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPolicies.ps1){:target="_blank"}
+you can download it here:
+[Create-CAPolicies - Github](https://github.com/Dikkekip/dikkekip.github.io/blob/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPolicies.ps1){:target="_blank"} - 
+ [Create-CAPolicies - RAW](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPolicies.ps1){:target="_blank"}
 ```powershell
 # PowerShell script content
 # Due to length, please refer to the script at the provided link.
