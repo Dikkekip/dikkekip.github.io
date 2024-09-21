@@ -129,7 +129,7 @@ The script automates the creation of Admin accounts and Break Glass accounts, se
 
 #### Admin Users Creation Script ⚙️
 
-For full details and to get the script, you can download it here: [Create-Users.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-Users.ps1){:target="_blank"}
+
 ![Screenshot](assets/img/SecuringAdminAccess/Create-Users.png)
 
 #### Key Features of the Script:
@@ -148,6 +148,7 @@ If your main admin accounts are locked out, Break Glass accounts are your fallba
 > **Note**: Due to the script's length, please refer to the script at the provided link.
 {: .prompt-info }
 <!-- markdownlint-restore --> Due to the script's length, please refer to the script at the provided link.
+For full details and to get the script, you can download it here: [Create-Users.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-Users.ps1){:target="_blank"}
 
 ```powershell
 # Function to generate a random string for Break Glass accounts
@@ -220,7 +221,7 @@ This spell automatically creates and applies the right Conditional Access polici
 
 #### Conditional Access Creation Script ⚙️
 
-For full details and to get the script, you can download it here: [Create-CAPolicies.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPolicies.ps1){:target="_blank"}
+
 
 ![Screenshot](assets/img/SecuringAdminAccess/Create-Ca.png)
 
@@ -228,8 +229,8 @@ For full details and to get the script, you can download it here: [Create-CAPoli
 <!-- markdownlint-disable -->
 > **Note**: Due to the script's length, please refer to the script at the provided link.
 {: .prompt-info }
-<!-- markdownlint-restore --> Due to the script's length, please refer to the script at the provided link.
-
+<!-- markdownlint-restore --> 
+you can download it here: [Create-CAPolicies.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPolicies.ps1){:target="_blank"}
 ```powershell
 # PowerShell script content
 # Due to length, please refer to the script at the provided link.
