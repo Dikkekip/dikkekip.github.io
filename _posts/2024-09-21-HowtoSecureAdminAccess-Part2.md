@@ -52,7 +52,7 @@ Managing security spells (oops, I mean policies) can be time-consuming. Here’s
 
 #### PowerShell Script for Creating Security Groups ⚙️
 
-You can find the script here: [Create-groups.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-groups.ps1)
+You can find the script here: [Create-groups.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-groups.ps1){:target="_blank"}
 
 ![Screenshot](assets/img/SecuringAdminAccess/Screenshot%202024-09-21%20142118.png)
 
@@ -129,8 +129,7 @@ The script automates the creation of Admin accounts and Break Glass accounts, se
 
 #### Admin Users Creation Script ⚙️
 
-For full details and to get the script, you can download it here: [Create-Users.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-Users.ps1)
-
+For full details and to get the script, you can download it here: [Create-Users.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-Users.ps1){:target="_blank"}
 ![Screenshot](assets/img/SecuringAdminAccess/Create-Users.png)
 
 #### Key Features of the Script:
@@ -221,7 +220,7 @@ This spell automatically creates and applies the right Conditional Access polici
 
 #### Conditional Access Creation Script ⚙️
 
-For full details and to get the script, you can download it here: [Create-CAPolicies.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPolicies.ps1)
+For full details and to get the script, you can download it here: [Create-CAPolicies.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPolicies.ps1){:target="_blank"}
 
 ![Screenshot](assets/img/SecuringAdminAccess/Create-Ca.png)
 
