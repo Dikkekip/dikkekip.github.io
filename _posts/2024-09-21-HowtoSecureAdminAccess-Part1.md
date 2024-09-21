@@ -7,8 +7,8 @@ description: "Securing Admin Access in Microsoft Entra ID 🛡️🛡️🛡️"
 categories: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
 tags: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
 image:
-  path: assets/img/1725962735025.gif
-  src: assets/img/1725962735025.gif
+  path: /assets/img/1725962735025.gif
+  src: /assets/img/1725962735025.gif
 toc: true
 ---
 
