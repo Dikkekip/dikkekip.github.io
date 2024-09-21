@@ -1,3 +1,18 @@
+---
+layout: post
+title:  "How to Secure Admin Access! - Part 1"
+date:   2024-09-24 07:40:59 +0100
+comments: true
+description: "Securing Admin Access in Microsoft Entra ID 🛡️🛡️🛡️"
+categories: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
+tags: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
+image:
+  path: assets/img/1725962735025.gif
+  src: assets/img/1725962735025.gif
+toc: true
+---
+
+
 ## Fortify Your Castle: How to Secure Admin Access with Phishing-Resistant Authentication and Token Protection
 
 Hello, fellow tech enthusiasts! 🎉 As we celebrate our **Microsoft Identity and Access Management Specialization renewal** at Devoteam, I thought it would be the perfect time to dive into a topic that's been buzzing in the IT corridors lately: **Securing Admin Access** in **Microsoft Entra ID**.
@@ -6,7 +21,6 @@ Imagine you're the ruler of a vast kingdom (your organization), and you've built
 
 So grab a cup of your favorite brew ☕, and let's embark on this security adventure together!
 
----
 
 ### The Evolving Threat Landscape: Why Phishing-Resistant Authentication Isn’t Enough
 
@@ -20,7 +34,6 @@ Even with these robust methods, attackers have found sneaky ways to bypass defen
 
 > **Real-World Scenario**: Microsoft's incident response team uncovered cases where attackers installed malware on admin devices, stealing tokens and gaining unauthorized access—all without triggering traditional security alarms.
 
----
 
 ### Continuous Access Evaluation: Your Real-Time Defense Shield 🛡️
 
