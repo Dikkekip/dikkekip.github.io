@@ -11,22 +11,23 @@ image:
   src: /assets/img/1725962735025.gif
 toc: true
 ---
+---
 
 ## How to Secure Admin Access - Part 2: Automating Persona-Based Conditional Access Policies 🛡️✨
 
-Welcome back, fellow IT wizards 🧙‍♂️🧙‍♀️, to our magical journey of securing admin access! In Part 1, we ventured into the realms of **Admin Access** and set the foundations for a secure kingdom. This time, we're diving into **Persona-Based Conditional Access Policies**—essentially enchanted wards 🧙‍♂️🔮 tailored to different roles within your organization. Instead of casting a generic **Protego Totalum** 🛡️ over everyone, we're going to fine-tune our spells (ahem, policies) based on role, access requirements, and risk levels.
+Welcome back, fellow IT wizards 🧙‍♂️🧙‍♀️, to our magical journey of securing admin access! In **Part 1**, we ventured into the realms of **Admin Access** and set the foundations for a secure kingdom. This time, we're diving into **Persona-Based Conditional Access Policies**—essentially enchanted wards 🧙‍♂️🔮 tailored to different roles within your organization. Instead of casting a generic **Protego Totalum** 🛡️ over everyone, we're going to fine-tune our spells (ahem, policies) based on role, access requirements, and risk levels.
 
 For example, your mighty **Global Administrator** (think **Dumbledore of Entra ID**) needs stricter security enchantments than an average user just accessing coffee orders ☕📋.
 
 ### Why Persona-Based Policies Matter ⚖️
 
-Not everyone in your organization needs the power of a **Nimbus 2000** 🧹. Some users, like HR employees handling sensitive data 🗂️, need extra protection, but it's nothing compared to what your **Global Administrators** need. That's where persona-based policies come in. Like casting a **Lumos** 💡 that’s bright enough to guide you but doesn’t blind anyone, these policies balance security and usability.
+Not everyone in your organization needs the power of a **Nimbus 2000** 🧹. Some users, like HR employees handling sensitive data 🗂️, require extra protection, but it's nothing compared to what your **Global Administrators** need. That's where persona-based policies come in. Like casting a **Lumos** 💡 that’s bright enough to guide you but doesn’t blind anyone, these policies balance security and usability.
 
 With these, you can require extra steps (think of MFA as a **magic incantation** 🧩) for high-risk users, while others breeze through securely. 🔐
 
 ### Persona Breakdown 🧙‍♂️📜
 
-In this realm of Conditional Access, users fit into different personas, each getting a specific set of security spells tailored to their role:
+In the realm of Conditional Access, users fit into different personas, each getting a specific set of security spells tailored to their role:
 
 - **ca-persona-admins**: High-privilege admins needing **phishing-resistant MFA** 🛡️ (you don’t want your castle walls breached by a simple charm 🧙‍♂️).
 - **ca-persona-global**: Global protection 🏰—applied universally to everyone. This is your foundation spell!
@@ -55,11 +56,13 @@ You can find the script here: [Create-groups.ps1](https://raw.githubusercontent.
 
 ![Screenshot](assets/img/SecuringAdminAccess/Screenshot%202024-09-21%20142118.png)
 
+
 <!-- markdownlint-capture -->
 <!-- markdownlint-disable -->
 > **Note**: Due to the script's length, please refer to the script at the provided link.
 {: .prompt-info }
-<!-- markdownlint-restore -->
+<!-- markdownlint-restore --> Due to the script's length, please refer to the script at the provided link.
+
 
 ```powershell
 # PowerShell script content
@@ -80,7 +83,6 @@ function Get-ValidMailNickname {
     return $mailNickname.ToLower()
 }
 
-
 function New-AADGroup {
     param (
         [string]$DisplayName,
@@ -92,37 +94,7 @@ function New-AADGroup {
         [string]$MembershipRuleProcessingState
     )
 
-    $validMailNickname = Get-ValidMailNickname -DisplayName $DisplayName
-
-    # Check if the group already exists
-    $existingGroup = Get-MgGroup -Filter "DisplayName eq '$DisplayName'"
-    
-    if ($existingGroup) {
-        Write-Host "Group '$DisplayName' already exists. Skipping creation." -ForegroundColor Yellow
-        return
-    }
-
-    $params = @{
-        DisplayName = $DisplayName
-        Description = $Description
-        MailNickname = $validMailNickname
-        SecurityEnabled = $SecurityEnabled
-        MailEnabled = $MailEnabled
-        GroupTypes = $GroupTypes
-    }
-
-    if ($MembershipRule) {
-        $params.MembershipRule = $MembershipRule
-        $params.MembershipRuleProcessingState = $MembershipRuleProcessingState
-    }
-
-    try {
-        $newGroup = New-MgGroup -BodyParameter $params
-        Write-Host "Group '$DisplayName' created successfully." -ForegroundColor Green
-    }
-    catch {
-        Write-Host "Error creating group '$DisplayName': $_" -ForegroundColor Red
-    }
+    # Function content continues...
 }
 
 # Connect to Microsoft Graph if not already connected
@@ -140,9 +112,7 @@ if (-not (Get-MgContext)) {
 }
 
 # Define the groups to create
-# left out because of length
-
-
+# Left out because of length
 
 foreach ($group in $groups) {
     New-AADGroup @group
@@ -155,7 +125,7 @@ This PowerShell script helps you create persona-based security groups for **admi
 
 Admins are like the **Masters of the Elder Wand** 🪄 in your organization—so they need extra layers of protection. Similarly, **Break Glass accounts** are your **emergency exit spells** 🧩, only used in dire situations when admin accounts might fail. The PowerShell script below ensures both types of accounts are secured with the proper magical safeguards 🛡️.
 
-The script automates the creation of Admin accounts and Break Glass accounts, setting them up with strong passwords (no Alohomora here!) and assigning them appropriate roles and permissions, including **Global Administrator role eligibility** through Privileged Identity Management (PIM).
+The script automates the creation of Admin accounts and Break Glass accounts, setting them up with strong passwords (no **Alohomora** here!) and assigning them appropriate roles and permissions, including **Global Administrator role eligibility** through Privileged Identity Management (PIM).
 
 #### Admin Users Creation Script ⚙️
 
@@ -174,14 +144,11 @@ For full details and to get the script, you can download it here: [Create-Users.
 
 If your main admin accounts are locked out, Break Glass accounts are your fallback. This script ensures their **Global Admin** role is always accessible, even when regular systems falter. They’re like magical safeguards with minimal everyday usage, but they’ll save you when things get chaotic! 🛡️✨
 
-
-#### Admin users creation script ⚙️
-
 <!-- markdownlint-capture -->
 <!-- markdownlint-disable -->
 > **Note**: Due to the script's length, please refer to the script at the provided link.
 {: .prompt-info }
-<!-- markdownlint-restore -->
+<!-- markdownlint-restore --> Due to the script's length, please refer to the script at the provided link.
 
 ```powershell
 # Function to generate a random string for Break Glass accounts
@@ -197,313 +164,7 @@ function Get-ExistingUser {
         [string]$UserPrincipalName
     )
 
-    try {
-        $user = Get-MgUser -Filter "userPrincipalName eq '$UserPrincipalName'" -ErrorAction Stop
-        return $user
-    }
-    catch {
-        return $null
-    }
-}
-
-# Function to reset a user's password
-function Reset-UserPassword {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$UserId
-    )
-
-    $password = New-ComplexPassword
-
-    $passwordProfile = @{
-        Password = $password
-        ForceChangePasswordNextSignIn = $true
-    }
-
-    try {
-        Update-MgUser -UserId $UserId -PasswordProfile $passwordProfile -ErrorAction Stop
-        Write-Host "Password has been reset successfully." -ForegroundColor Green
-        Write-Host "Temporary password: $password" -ForegroundColor Yellow
-        Write-Host "Please ensure the user changes this password upon next login." -ForegroundColor Yellow
-        Log-Message "Password reset for UserId: $UserId."
-    }
-    catch {
-        Write-Host "Error resetting password: $_" -ForegroundColor Red
-        Log-Message "Error resetting password for UserId: $UserId. Error: $_"
-    }
-}
-
-# Function to create a new admin account or handle existing one
-function New-AdminAccount {
-    while ($true) {
-        $userId = Read-Host "Enter the 3 or 4 letter user ID for the admin account"
-        if ($userId -match '^[A-Za-z]{3,4}$') {
-            break
-        }
-        else {
-            Write-Host "Invalid User ID. Please enter exactly 3 or 4 letters." -ForegroundColor Yellow
-        }
-    }
-    $mgAdminUser = Get-MgContext | Select-Object -ExpandProperty Account
-    $tenantDomain = $mgAdminUser -split '@' | Select-Object -Last 1
-    $userPrincipalName = "admin-$userId@$tenantDomain"
-
-    # Check if UPN already exists
-    $existingUser = Get-ExistingUser -UserPrincipalName $userPrincipalName
-    if ($existingUser) {
-        Write-Host "A user with UPN $userPrincipalName already exists." -ForegroundColor Yellow
-        Log-Message "User with UPN $userPrincipalName already exists."
-        $choice = Read-Host "Do you want to reset the existing user's password? (Y/N)"
-        if ($choice -eq "Y") {
-            Reset-UserPassword -UserId $existingUser.ID
-            $personaGroup = get-MgGroup -filter "displayName eq 'ca-persona-admins'" 
-            New-MgGroupMember -GroupId $personaGroup.id -DirectoryObjectId $newUser.id -ErrorAction SilentlyContinue
-        }
-        else {
-            $personaGroup = get-MgGroup -filter "displayName eq 'ca-persona-admins'" 
-            New-MgGroupMember -GroupId $personaGroup.id -DirectoryObjectId $newUser.id -ErrorAction SilentlyContinue
-            Write-Host "Skipping password reset. Please choose a different User ID." -ForegroundColor Red
-            Log-Message "Skipped password reset for existing user with UPN $userPrincipalName."
-        }
-        return $existingUser
-    }
-    
-    $inputName = Read-Host "Enter the name for the admin account"
-    $displayName = "Cloud Admin | $inputName"
-    
-    $password = New-ComplexPassword
-
-    $passwordProfile = @{
-        Password = $password
-        ForceChangePasswordNextSignIn = $true
-    }
-
-    $params = @{
-        AccountEnabled = $true
-        DisplayName = $displayName
-        MailNickname = "admin-$userId"
-        UserPrincipalName = $userPrincipalName
-        PasswordProfile = $passwordProfile
-        Department = "Cloud Admins"
-    }
-
-    try {
-        $newUser = New-MgUser -BodyParameter $params -ErrorAction Stop
-        $personaGroup = get-MgGroup -filter "displayName eq 'ca-persona-admins'" 
-        New-MgGroupMember -GroupId $personaGroup.id -DirectoryObjectId $newUser.id
-        Write-Host "Admin account created: $userPrincipalName" -ForegroundColor Green
-        Write-Host "Display Name: $displayName" -ForegroundColor Green
-        Write-Host "Temporary password: $password" -ForegroundColor Yellow
-        Write-Host "Please ensure to change this password upon first login." -ForegroundColor Yellow
-        Log-Message "Admin account created: $userPrincipalName."
-        return $newUser
-    }
-    catch {
-        Write-Host "Error creating admin account: $_" -ForegroundColor Red
-        Log-Message "Error creating admin account: $_"
-    }
-}
-
-# Function to check if user already has Global Admin role eligibility
-function UserHasGlobalAdminEligibility {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$UserId,
-        [string]$RoleDefinitionId
-    )
-
-    try {
-        # Retrieve eligibility schedule requests for the user and role
-        $eligibilityRequests = Get-MgRoleManagementDirectoryRoleEligibilityScheduleRequest -Filter "principalId eq '$UserId' and roleDefinitionId eq '$RoleDefinitionId'" -ErrorAction Stop
-        if ($eligibilityRequests.Count -gt 0) {
-            return $true
-        }
-        return $false
-    }
-    catch {
-        Write-Host "Error retrieving eligibility schedule requests: $_" -ForegroundColor Red
-        Log-Message "Error retrieving eligibility schedule requests for UserId: $UserId. Error: $_"
-        return $false
-    }
-}
-# Function to assign Global Administrator role eligibility using PIM
-function Assign-GlobalAdminRoleEligibility {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$UserId
-    )
-
-    # Retrieve the RoleDefinitionId for Global Administrator dynamically
-    try {
-        # Fetch all role definitions matching "Global Administrator"
-        $roleDefinition = Get-MgRoleManagementDirectoryRoleDefinition -Filter "displayName eq 'Global Administrator'" -ErrorAction Stop
-        
-        if ($roleDefinition.Count -eq 0) {
-            Write-Host "Global Administrator role definition not found." -ForegroundColor Red
-            Log-Message "Global Administrator role definition not found."
-            return
-        }
-
-        # Use the first role definition ID found for 'Global Administrator'
-        $globalAdminRoleDefinitionId = $roleDefinition.Id
-        Write-Host "Global Administrator RoleDefinitionId: $globalAdminRoleDefinitionId" -ForegroundColor Green
-        Log-Message "Global Administrator RoleDefinitionId retrieved: $globalAdminRoleDefinitionId."
-    }
-    catch {
-        Write-Host "Error retrieving Global Administrator RoleDefinitionId: $_" -ForegroundColor Red
-        Log-Message "Error retrieving Global Administrator RoleDefinitionId. Error: $_"
-        return
-    }
-
-    # Assign role eligibility via PIM
-    Add-GlobalAdminRoleEligibility -UserId $UserId -RoleDefinitionId $globalAdminRoleDefinitionId
-}
-
-# Function to add role eligibility with more detailed logging and error handling
-function Add-GlobalAdminRoleEligibility {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$UserId,
-        [string]$RoleDefinitionId
-    )
-
-    # Define schedule info
-    $currentDateTime = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-    $expirationDateTime = (Get-Date).AddYears(1).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-
-    $params = @{
-        Action = "adminAssign"
-        Justification = "Assign Global Administrator eligibility to restricted user"
-        RoleDefinitionId = $RoleDefinitionId
-        DirectoryScopeId = "/"
-        PrincipalId = $UserId
-        ScheduleInfo = @{
-            StartDateTime = $currentDateTime
-            Expiration = @{
-                Type = "AfterDateTime"
-                EndDateTime = $expirationDateTime
-            }
-        }
-    }
-
-    try {
-        # Check if the user already has eligibility
-        $hasEligibility = UserHasGlobalAdminEligibility -UserId $UserId -RoleDefinitionId $RoleDefinitionId
-        if ($hasEligibility) {
-            Write-Host "User already has eligibility for the Global Administrator role. Skipping assignment." -ForegroundColor Yellow
-            Log-Message "User with UserId: $UserId already has eligibility for Global Administrator role."
-            return
-        }
-
-        # Create the eligibility schedule request
-        New-MgRoleManagementDirectoryRoleEligibilityScheduleRequest -BodyParameter $params -ErrorAction Stop
-        Write-Host "Global Administrator role eligibility assigned to user with ID $UserId." -ForegroundColor Green
-        Log-Message "Global Administrator role eligibility assigned to user ID: $UserId."
-    }
-    catch {
-        Write-Host "Error assigning Global Administrator role eligibility: $_" -ForegroundColor Red
-        Log-Message "Error assigning Global Administrator role eligibility to user ID: $UserId. Error: $_"
-    }
-}
-
-
-# Function to create or ensure two Break Glass accounts and assign role eligibility
-function New-BreakGlassAccount {
-    # Define the maximum number of BG accounts
-    $maxBGAccounts = 2
-
-    # Define the Department attribute for BG accounts
-    $bgDepartment = "Break Glass Accounts"
-
-    try {
-        # Retrieve existing BG accounts
-        $existingBGUsers = Get-MgUser -Filter "department eq '$bgDepartment'" -Select "id, displayName, userPrincipalName" -ErrorAction Stop
-
-        $currentBGCount = $existingBGUsers.Count
-
-        if ($currentBGCount -ge $maxBGAccounts) {
-            Write-Host "There are already $currentBGCount Break Glass accounts. No additional accounts will be created." -ForegroundColor Yellow
-            Log-Message "There are already $currentBGCount Break Glass accounts. No additional accounts will be created."
-
-            # Assign role eligibility to existing BG accounts if not already assigned
-            foreach ($bgUser in $existingBGUsers) {
-                Assign-GlobalAdminRoleEligibility -UserId ([string]$bgUser.Id)
-                $personaGroup = get-MgGroup -filter "displayName eq 'ca-breakglassaccounts'" 
-                New-MgGroupMember -GroupId $personaGroup.id -DirectoryObjectId $bgUser.Id -ErrorAction SilentlyContinue
-            }
-
-            return
-        }
-
-        $mgAdminUser = Get-MgContext | Select-Object -ExpandProperty Account
-        $tenantDomain = $mgAdminUser -split '@' | Select-Object -Last 1
-        $bgToCreate = $maxBGAccounts - $currentBGCount
-
-        for ($i = 1; $i -le $bgToCreate; $i++) {
-            $bgAccountName = "bg$i"
-            $randomString = New-RandomString
-            $userPrincipalName = "$bgAccountName-$randomString@$tenantDomain"
-
-            # Check if BG account with this UPN already exists
-            $existingUser = Get-ExistingUser -UserPrincipalName $userPrincipalName
-            if ($existingUser) {
-                Write-Host "A Break Glass account with UPN $userPrincipalName already exists. Skipping creation of BG${i}." -ForegroundColor Yellow
-                Log-Message "A Break Glass account with UPN $userPrincipalName already exists. Skipping creation of BG${i}."
-
-                # Assign role eligibility if not already assigned
-                Assign-GlobalAdminRoleEligibility -UserId ([string]$existingUser.Id)
-
-                continue
-            }
-
-            # MailNickname is set as BG1, BG2, etc.
-            $mailNickname = $bgAccountName
-
-            $password = New-ComplexPassword
-
-            $passwordProfile = @{
-                Password = $password
-                ForceChangePasswordNextSignIn = $false
-            }
-
-            $params = @{
-                AccountEnabled = $true
-                DisplayName = "Break Glass Account $i"
-                MailNickname = $mailNickname
-                UserPrincipalName = $userPrincipalName
-                PasswordProfile = $passwordProfile
-                Department = $bgDepartment
-            }
-
-            try {
-                $newBGUser = New-MgUser -BodyParameter $params -ErrorAction Stop
-                $personaGroup = get-MgGroup -filter "displayName eq 'ca-breakglassaccounts'" 
-                New-MgGroupMember -GroupId $personaGroup.id -DirectoryObjectId $newBGUser.id
-                Write-Host "Break Glass account created: $userPrincipalName" -ForegroundColor Green
-                Write-Host "Password: $password" -ForegroundColor Yellow
-                Write-Host "Please store this password securely." -ForegroundColor Yellow
-                Log-Message "Break Glass account created: $userPrincipalName."
-
-                # Assign Global Admin role eligibility via PIM
-                Wait-Job -Name "CreateBGAccounts" -Timeout 5
-                Write-Host "Assigning Global Administrator role eligibility to Break Glass account BG${i}..." -ForegroundColor Cyan
-                Assign-GlobalAdminRoleEligibility -UserId ([string]$newBGUser.Id)
-            }
-            catch {
-                Write-Host "Error creating Break Glass account BG${i}: $_" -ForegroundColor Red
-                Log-Message "Error creating Break Glass account BG${i}: $_"
-            }
-        }
-
-        # After creation, assign role eligibility to existing BG accounts if any
-        foreach ($bgUser in $existingBGUsers) {
-            Assign-GlobalAdminRoleEligibility -UserId ([string]$bgUser.Id)
-        }
-    }
-    catch {
-        Write-Host "Error retrieving existing Break Glass accounts: $_" -ForegroundColor Red
-        Log-Message "Error retrieving existing Break Glass accounts: $_"
-    }
+    # Function content continues...
 }
 
 # Main script logic
@@ -525,9 +186,7 @@ else {
     Write-Host "Invalid choice. Please run the script again and choose A or B." -ForegroundColor Red
     Log-Message "Invalid choice entered: $choice"
 }
-
 ```
-
 
 ### Automating Conditional Access Policies (No Marauder’s Map Needed) 🗺️
 
@@ -543,7 +202,7 @@ Instead of excluding these admins from our **Phishing Resistant** policy forever
 
 #### Pro Tip:
 
-> **⚠️ Always keep a break-glass account handy!** Configuring Conditional Access with code can be dangerous. Thankfully, this script creates policies without enabling them immediately. Consider it your safety net (or **Protego charm** 🛡️) before you apply the real protection! 🙃
+> **⚠️ Always keep a Break Glass account handy!** Configuring Conditional Access with code can be dangerous. Thankfully, this script creates policies without enabling them immediately. Consider it your safety net (or **Protego charm** 🛡️) before you apply the real protection! 🙃
 
 ### Key Conditional Access Policies for Admin Protection 🛡️
 
@@ -565,11 +224,12 @@ This spell automatically creates and applies the right Conditional Access polici
 For full details and to get the script, you can download it here: [Create-CAPolicies.ps1](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPolicies.ps1)
 
 ![Screenshot](assets/img/SecuringAdminAccess/Create-Ca.png)
+
 <!-- markdownlint-capture -->
 <!-- markdownlint-disable -->
 > **Note**: Due to the script's length, please refer to the script at the provided link.
 {: .prompt-info }
-<!-- markdownlint-restore -->
+<!-- markdownlint-restore --> Due to the script's length, please refer to the script at the provided link.
 
 ```powershell
 # PowerShell script content
@@ -578,13 +238,13 @@ For full details and to get the script, you can download it here: [Create-CAPoli
 # Define required modules
 $requiredModules = @("microsoft.graph.authentication", "microsoft.graph.identity.signins", "microsoft.graph.groups")
 
-# function to create a conditional access policy
-function new-conditionalaccesspolicy {
+# Function to create a conditional access policy
+function New-ConditionalAccessPolicy {
     param (
         [hashtable]$policyparams
     )
 
-    new-mgidentityconditionalaccesspolicy -bodyparameter $policyparams
+    New-MgIdentityConditionalAccessPolicy -BodyParameter $policyparams
 }
 
 $groups = Get-MgGroup -All | select displayname, id
@@ -596,57 +256,17 @@ function Get-GroupIdByName {
     $group = $groups | Where-Object { $_.displayname -eq $groupName }
     return $group.id
 }
+
 # Define the policy parameters
-# left out because of length
-
-
-# Update IncludeUsers and ExcludeGroups with group IDs
-foreach ($policy in $policies) {
-    if ($policy.Conditions.Users.IncludeGroups) {
-        $policy.Conditions.Users.IncludeGroups = $policy.Conditions.Users.IncludeGroups | ForEach-Object { Get-GroupIdByName -groupName $_ -groups $groups }
-    }
-    if ($policy.Conditions.Users.ExcludeGroups) {
-        $policy.Conditions.Users.ExcludeGroups = $policy.Conditions.Users.ExcludeGroups | ForEach-Object { Get-GroupIdByName -groupName $_ -groups $groups }
-    }
-}
-
-# Log file path
-$logFilePath = ".\failed_policies.log"
-
-# Retrieve existing policies
-$existingPolicies = Get-MgIdentityConditionalAccessPolicy -All
+# Left out because of length
 
 # Apply the policies
 foreach ($policy in $policies) {
-    $existingPolicy = $existingPolicies | Where-Object { $_.DisplayName -eq $policy.DisplayName }
-    
-    if ($existingPolicy) {
-        Write-Host "Policy $($policy.DisplayName) already exists. Checking settings..."
-        # Compare settings (simplified comparison, adjust as needed)
-        if ($existingPolicy.Conditions -ne $policy.Conditions -or $existingPolicy.State -ne $policy.State) {
-            Write-Host "Policy $($policy.DisplayName) settings differ. Updating policy..."
-            try {
-                Update-MgIdentityConditionalAccessPolicy -ConditionalAccessPolicyId $existingPolicy.Id -BodyParameter $policy
-            } catch {
-                Write-Host "Failed to update policy $($policy.DisplayName)"
-                Add-Content -Path $logFilePath -Value "Failed to update policy $($policy.DisplayName): $_"
-            }
-        } else {
-            Write-Host "Policy $($policy.DisplayName) settings are identical. No update needed."
-        }
-    } else {
-        Write-Host "Creating policy $($policy.DisplayName)"
-        try {
-            New-MgIdentityConditionalAccessPolicy -BodyParameter $policy
-        } catch {
-            Write-Host "Failed to create policy $($policy.DisplayName)"
-            Add-Content -Path $logFilePath -Value "Failed to create policy $($policy.DisplayName): $_"
-        }
-    }
+    # Function content continues...
 }
-# disconnect from microsoft graph
-disconnect-mggraph
 
+# Disconnect from Microsoft Graph
+Disconnect-MgGraph
 ```
 
 ### Conclusion: Mastering the Security Spellbook 📜✨
@@ -660,3 +280,5 @@ Stay tuned for more chapters in this security spellbook, where we’ll continue 
 ---
 
 Feel free to reach out if you have any questions or need further guidance on implementing these magical security measures. Until next time, keep your wands at the ready and your systems secure! 🪄🔐
+
+---
