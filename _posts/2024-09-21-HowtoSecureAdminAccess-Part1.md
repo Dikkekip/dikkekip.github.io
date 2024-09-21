@@ -47,29 +47,39 @@ Among these, **Primary Refresh Tokens (PRT)** and **Family of Refresh Tokens (FR
 Ensuring robust **token management** and security through **phishing-resistant MFA** and **Conditional Access policies** is critical to protecting your organization's resources from unauthorized access. For more details, you can refer to the full breakdown [here](https://www.xintra.org/blog/tokens-in-entra-id-guide/).	
 
 ---
+# Continuous Access Evaluation: Your Real-Time Defense Shield 🛡️
 
-### Continuous Access Evaluation: Your Real-Time Defense Shield 🛡️
+Continuous Access Evaluation (CAE) enhances security by enabling real-time token validation, allowing tokens to be revoked immediately when critical changes occur—such as a password reset, account compromise, or network location shift. This dynamic validation makes it harder for attackers to misuse stolen tokens.
 
-**Continuous Access Evaluation (CAE)** enhances security by enabling **real-time** token validation, allowing tokens to be revoked immediately when critical changes occur—such as a password reset, account compromise, or network location shift. This dynamic validation makes it harder for attackers to misuse stolen tokens.
+## What Is CAE?
 
-#### What Is CAE?
+Unlike the standard one-hour token expiration, CAE ensures tokens are re-evaluated when necessary. It creates a continuous conversation between Microsoft Entra ID and services like Exchange Online, Teams, and SharePoint Online, enabling immediate action on security risks.
 
-Unlike the standard one-hour token expiration, CAE ensures tokens are re-evaluated when necessary. It creates a continuous conversation between **Microsoft Entra ID** and services like **Exchange Online**, **Teams**, and **SharePoint Online**, enabling immediate action on security risks.
-
-#### Benefits of CAE
+## Benefits of CAE
 
 - **Real-time response**: Tokens are dynamically updated in response to events like password changes or location changes, revoking access when conditions change.
-- **Network enforcement**: Integrates with **Conditional Access policies** to block tokens used from untrusted networks, reducing the risk of token replay attacks.
+- **Network enforcement**: Integrates with Conditional Access policies to block tokens used from untrusted networks, reducing the risk of token replay attacks.
 
-#### Where CAE Works—and Where It Doesn’t
+## Where CAE Works—and Where It Doesn’t
 
-While CAE supports **Exchange Online**, **Teams**, and **SharePoint Online**, it **cannot protect Tier-0 admin accounts** effectively because these accounts typically don’t use email or communication services. **Admin accounts** are often best-practice configured with **phishing-resistant MFA** but, once authenticated, the session token is valid for up to an hour, leaving potential vulnerability post-authentication.
+While CAE supports Exchange Online, Teams, and SharePoint Online, **it cannot currently be used for Tier-0 admin access**. This is because the Azure Portal and Microsoft 365 endpoints do not support CAE-enabled clients, leaving a gap for these high-privilege accounts. 
 
-To secure **Tier-0** resources and **admin accounts**, CAE must be used in combination with **Privileged Access Workstations (PAWs)**, **Conditional Access policies**, and **phishing-resistant MFA**. These measures ensure that even if a token is stolen, other layers of defense are in place.
+Admin accounts typically don’t rely on email or communication services, and once authenticated, the session token is still valid for up to an hour. This leaves potential vulnerability post-authentication, as CAE is unable to trigger a real-time re-evaluation of the token for admin access scenarios.
 
-#### The Future of CAE
+However, there is a potential future where CAE could become a valuable defense for Tier-0 admin access. If CAE support is extended to the Azure Portal and Microsoft 365 endpoints, it would allow for stricter token control. **Combining CAE with tools like the Global Connect client and trusted location Conditional Access policies** would provide tight control over token issuance, greatly reducing the risk of token replay attacks. But for now, we have to rely on other security measures.
 
-CAE is a valuable layer in modern security strategies, and as it expands to cover more services, it will play an even more critical role in protecting environments. However, for now, **admin access** requires a mix of CAE and other advanced measures to fully protect high-value accounts.
+### Current Solutions for Securing Admin Accounts
+
+To secure Tier-0 resources and admin accounts today, CAE must be used in combination with:
+- **Privileged Access Workstations (PAWs)**: Dedicated workstations for admin tasks, isolated from regular day-to-day operations.
+- **Conditional Access policies**: Enforce trusted locations and strict network conditions.
+- **Phishing-resistant MFA**: Adds an extra layer of protection by ensuring only authorized users can access admin accounts.
+
+These measures ensure that even if a token is stolen, other layers of defense remain in place to protect critical resources.
+
+## The Future of CAE
+
+CAE is a valuable layer in modern security strategies, and as it expands to cover more services, it will play an even more critical role in protecting environments. The future could bring support for Tier-0 admin accounts, which would be a game-changer for securing high-value tokens in real time. Until then, CAE remains a key component of overall security but should be supplemented by other advanced measures for high-value accounts.
 
 For more information, visit [CAE strict enforcement](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-continuous-access-evaluation-strict-enforcement).
 
