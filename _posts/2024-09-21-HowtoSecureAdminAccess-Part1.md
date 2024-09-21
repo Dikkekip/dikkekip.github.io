@@ -129,39 +129,7 @@ Not all your subjects need the same level of protection. A blacksmith doesn't ne
 
 It's a strategy where you define personas—groups of users with similar roles or security requirements—and assign appropriate authentication methods and policies to each.
 
-**Example Personas at Devoteam**:
-
-1. **Admins**:
-
-   - **Authentication Methods**:
-     - Phishing-resistant MFA (FIDO2 keys, WHfB).
-     - Passwordless authentication.
-   - **Policies**:
-     - Require compliant devices.
-     - Enforce compliant network checks.
-     - Apply strict session controls (e.g., sign-in frequency).
-     - Limit access to sensitive applications.
-
-2. **Externals**:
-
-   - **Authentication Methods**:
-     - MFA using Authenticator app or phone call.
-   - **Policies**:
-     - Limit access to specific applications.
-     - Enforce time-bound access.
-     - Require device compliance if possible.
-     - Monitor for unusual activities.
-
-3. **Developers**:
-
-   - **Authentication Methods**:
-     - MFA required.
-     - Passwordless preferred.
-   - **Policies**:
-     - Enforce device compliance.
-     - Require access from specific network locations.
-     - Implement Conditional Access App Control for data exfiltration prevention.
-
+- **High-Risk Roles**: Require stronger authentication methods.
 By customizing authentication methods and policies per persona, you strike the right balance between security and usability.
 
 #### Benefits of Persona-Based Authentication
@@ -195,7 +163,7 @@ By customizing authentication methods and policies per persona, you strike the r
    - Regularly review authentication logs.
    - Adjust policies based on emerging threats or organizational changes.
 
-6. **Leverage Azure AD Authentication Strengths**:
+6. **Leverage Entra ID Authentication Strengths**:
 
    - Use authentication strengths in Conditional Access to specify required authentication methods for accessing resources.
 
@@ -215,10 +183,6 @@ Let's recap our master plan to secure the realm:
    - Ensure devices meet security standards.
    - Reduce malware risks.
 
-3. **Continuous Access Evaluation (CAE)**:
-
-   - Activate CAE for supported services.
-   - Enable real-time threat response.
 
 4. **Compliant Network Checks**:
 
@@ -230,7 +194,7 @@ Let's recap our master plan to secure the realm:
    - Isolate admin tasks on secure devices.
    - Minimize token theft risks.
 
-6. **Persona-Based Authentication**:
+7. **Persona-Based Authentication**:
 
    - Tailor authentication methods and policies to user roles.
    - Balance security with usability.
@@ -272,6 +236,7 @@ Remember, in the words of a wise strategist: *"The best offense is a good defens
 
   - [Conditional Access Authentication Strengths](https://learn.microsoft.com/azure/active-directory/authentication/concept-authentication-strengths)
   - [Plan a Conditional Access Deployment](https://learn.microsoft.com/azure/active-directory/conditional-access/plan-conditional-access)
+  - [Persona-Based Conditional Access](https://learn.microsoft.com/en-us/azure/architecture/guide/security/conditional-access-architecture)
 
 ---
 
