@@ -1,11 +1,11 @@
 ---
 layout: post
 title:  "How to Secure Admin Access! - Part 1"
-date:   2024-09-24 07:40:59 +0100
+date:   2024-09-21 10:00:00 +0530
 comments: true
-description: "Securing Admin Access in Microsoft Entra ID 🛡️🛡️🛡️"
+description: "Securing Admin Access in Microsoft Entra ID: Phishing-Resistant Authentication, Token Protection, and More!"
 categories: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
-tags: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
+tags: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure]
 image:
   path: /assets/img/1725962735025.gif
   src: /assets/img/1725962735025.gif
