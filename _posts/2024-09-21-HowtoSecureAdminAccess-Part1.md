@@ -8,7 +8,6 @@ tags: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Securit
 image:
   path: /assets/img/1725962735025.gif
   src: /assets/img/1725962735025.gif
-toc: true
 ---
 
 

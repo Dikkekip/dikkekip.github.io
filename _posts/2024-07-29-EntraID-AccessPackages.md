@@ -2,7 +2,6 @@
 layout: post
 title: "🏰 Automating Access Package Creation for Entra ID roles with PowerShell"
 date: 2024-08-01 07:40:59 +0100
-comments: true
 description: "Discover the magic of automating Entra ID roles with PowerShell and GraphAPI in Azure."
 categories: [Azure, PowerShell, Cloud Computing, DevOps, Entra ID, GraphAPI]
 tags:
@@ -21,7 +20,6 @@ tags:
 image:
   path: /assets/img/myaccess.jpeg
   src: /assets/img/myaccess.jpeg
-toc: true
 ---
 # 🏰 Automating Access Package Creation for Entra ID roles with PowerShell
 
