@@ -2,14 +2,12 @@
 layout: post
 title:  "🚀 PIM for Groups: Automate Assignments with the GraphAPI!"
 date:   2024-01-24 07:40:59 +0100
-comments: true
 description: "Discover the magic of automating PIM for groups with PowerShell and GraphAPI in Azure."
 categories: [Azure, PowerShell, Cloud Computing, DevOps, PIM, GraphAPI]
 tags: [Azure PIM, PowerShell Scripting, GraphAPI, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
 image:
   path: /assets/img/pim-for-groups/thumbnail.png
   src: /assets/img/pim-for-groups/thumbnail.png
-toc: true
 ---
 
 Hey tech enthusiasts! 👨‍💻🚀 Today, we're venturing into the mystical realm of Privileged Identity Management (PIM) iteration 3 APIs. Ever felt like deciphering PIM APIs is like unraveling ancient runes? Join the club! Today's quest involves the nuances of activating roles for groups eligible under PIM...

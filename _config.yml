@@ -95,12 +95,12 @@ comments:
     repo: "Dikkekip/dikkekip.github.io"
     repo_id: "R_kgDOLIiTTQ"
     category: "Posts"
-    category_id: "42648912"
-    mapping: # optional, default to 'pathname'
+    category_id: "DIC_kwDOLIiTTc4Cc0Ud"
+    mapping: "title"
     strict: # optional, default to '0'
     input_position: # optional, default to 'bottom'
     lang: # optional, default to the value of `site.lang`
-    reactions_enabled: # optional, default to the value of `1`
+    reactions_enabled: "1"
 
 # Self-hosted static assets, optional › https://github.com/cotes2020/chirpy-static-assets
 assets:
