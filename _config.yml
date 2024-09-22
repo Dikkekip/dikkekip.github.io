@@ -92,10 +92,10 @@ comments:
     issue_term: # < url | pathname | title | ...>
   # Giscus options › https://giscus.app
   giscus:
-    repo: Dikkekip/dikkekip.github.io
-    repo_id: R_kgDOLIiTTQ
-    category: Posts
-    category_id: 42648912
+    repo: "Dikkekip/dikkekip.github.io"
+    repo_id: "R_kgDOLIiTTQ"
+    category: "Posts"
+    category_id: "42648912"
     mapping: # optional, default to 'pathname'
     strict: # optional, default to '0'
     input_position: # optional, default to 'bottom'

@@ -2,7 +2,7 @@
 layout: post
 title:  "How to Secure Admin Access! - Part 2"
 date:   2024-09-21 10:00:00 +0530
-comments: true
+mermaid: true
 description: "Automating Persona-Based Conditional Access Policies"
 categories: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
 tags: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure]
@@ -10,7 +10,6 @@ image:
   path: /assets/img/SecuringAdminAccess/conditional-access.webp
   src: /assets/img/SecuringAdminAccess/conditional-access.webp
 toc: true
----
 ---
 
 ## How to Secure Admin Access - Part 2: Automating Persona-Based Conditional Access Policies 🛡️✨
