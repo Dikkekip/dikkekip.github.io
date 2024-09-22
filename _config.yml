@@ -96,7 +96,7 @@ comments:
     repo_id: "R_kgDOLIiTTQ"
     category: "Posts"
     category_id: "DIC_kwDOLIiTTc4Cc0Ud"
-    mapping: "title"
+    mapping: #
     strict: # optional, default to '0'
     input_position: # optional, default to 'bottom'
     lang: # optional, default to the value of `site.lang`
