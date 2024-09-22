@@ -7,8 +7,8 @@ description: "Automating Persona-Based Conditional Access Policies"
 categories: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
 tags: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure]
 image:
-  path: /assets/img/1725962735025.gif
-  src: /assets/img/1725962735025.gif
+  path: /assets/img/SecuringAdminAccess/conditional-access.webp
+  src: /assets/img/SecuringAdminAccess/conditional-access.webp
 toc: true
 ---
 ---
@@ -75,7 +75,7 @@ function Get-ValidMailNickname {
         [string]$DisplayName
     )
     # Remove any non-alphanumeric characters and replace spaces with underscores
-    $mailNickname = $DisplayName -replace '[^\w\-]', '' -replace '\s', '_'
+    $mailNickname = $DisplayName -replace '[^/w/-]', '' -replace '/s', '_'
     
     # Truncate to 64 characters if longer
     if ($mailNickname.Length -gt 64) {
