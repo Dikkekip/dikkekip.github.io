@@ -36,6 +36,17 @@ Our mission today is to create a set of Access Packages designed to assign Entra
 3. Ensure access reviews on critical admin roles
 4. Improve security by standardizing the approval process for admin roles
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
+> **Note**: The script had a small bug so I updated the full version of the script. The script is now fully functional and ready for use. 03-10-2024
+{: .prompt-info }
+<!-- markdownlint-restore -->
+
+You can find the script here on GitHub:
+[Create-Access-Package - Github](https://github.com/Dikkekip/dikkekip.github.io/blob/main/scripts/2024-07-29-EntraID-AccessPackages/Create-Access-Package.ps1){:target="_blank"}
+[Create-Access-Package - RAW](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-EntraID-AccessPackages/Create-Access-Package.ps1){:target="_blank"}
+
+
 ## 📚 Gathering Our Magical Artifacts
 
 Before we begin our incantations, we must gather the essential magical artifacts — our PowerShell modules. These modules are the conduits through which we'll channel the power of Microsoft Graph to bend Entra ID to our will.

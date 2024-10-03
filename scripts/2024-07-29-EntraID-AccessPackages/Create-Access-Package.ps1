@@ -30,6 +30,67 @@ https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-acc
 
 # Function to select a group
 
+# Define log file path
+$logDirectory = "C:\Logs"
+$logFile = Join-Path -Path $logDirectory -ChildPath "EntraIDAccessPackageCreation.log"
+
+# Function to log messages
+function Write-Log {
+    param (
+        [string]$Message,
+        [string]$Level = "INFO"
+    )
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $logEntry = "$timestamp [$Level] $Message"
+    Add-Content -Path $logFile -Value $logEntry
+}
+
+# Ensure the log directory exists
+if (-not (Test-Path -Path $logDirectory)) {
+    try {
+        New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
+        Write-Log "Created log directory at $logDirectory."
+    }
+    catch {
+        Write-Host "❌ Failed to create log directory at $logDirectory. Error: $_" -ForegroundColor Red
+        throw "Failed to create log directory."
+    }
+}
+
+# Function to ensure required modules are installed and imported
+function Ensure-Modules {
+    $requiredModules = @(
+        "Microsoft.Graph.Authentication",
+        "Microsoft.Graph.Identity.Governance",
+        "Microsoft.Graph.Identity.DirectoryManagement",
+        "Microsoft.PowerShell.ConsoleGuiTools"
+    )
+
+    foreach ($module in $requiredModules) {
+        if (-not (Get-Module -ListAvailable -Name $module)) {
+            Write-Host "📦 Installing missing module: $module" -ForegroundColor Yellow
+            try {
+                Install-Module -Name $module -Force -AllowClobber -Scope CurrentUser
+                Write-Log "Installed module: $module"
+            }
+            catch {
+                Write-Host "❌ Failed to install module: $module. Error: $_" -ForegroundColor Red
+                Write-Log "Failed to install module: $module. Error: $_"
+                throw "Module installation failed."
+            }
+        }
+        try {
+            Import-Module $module -ErrorAction Stop
+            Write-Log "Imported module: $module"
+        }
+        catch {
+            Write-Host "❌ Failed to import module: $module. Error: $_" -ForegroundColor Red
+            Write-Log "Failed to import module: $module. Error: $_"
+            throw "Module import failed."
+        }
+    }
+}
+
 function Select-Group {
     Write-Host "🔍 Fetching dynamic groups for selection..."
     $groups = Get-MgGroup -Filter "groupTypes/any(g:g eq 'DynamicMembership')" | Select-Object DisplayName, Id
@@ -168,13 +229,13 @@ function Add-RoleScopeToAccessPackage {
     Write-Host "🔍 Attempting to add role scope for $($Role.DisplayName) to access package $AccessPackageId" -ForegroundColor Yellow
 
     try {
-        $roleResource = Get-MgEntitlementManagementCatalogResource -AccessPackageCatalogId $CatalogId -Filter "originId eq '$($Role.RoleTemplateId)' and originSystem eq 'DirectoryRole'"
+        $roleResource = Get-MgEntitlementManagementCatalogResource -AccessPackageCatalogId $CatalogId -Filter "originId eq '$($Role.TemplateId)' and originSystem eq 'DirectoryRole'"
         
         if (-not $roleResource) {
             Write-Host "⚠️ Role resource not found in catalog. Attempting to add it..." -ForegroundColor Yellow
             Add-EntraRoleToCatalog -CatalogId $CatalogId -Role $Role
             Start-Sleep -Seconds 10  # Wait for a bit to ensure the role is added
-            $roleResource = Get-MgEntitlementManagementCatalogResource -AccessPackageCatalogId $CatalogId -Filter "originId eq '$($Role.RoleTemplateId)' and originSystem eq 'DirectoryRole'"
+            $roleResource = Get-MgEntitlementManagementCatalogResource -AccessPackageCatalogId $CatalogId -Filter "originId eq '$($Role.TemplateId)' and originSystem eq 'DirectoryRole'"
         }
 
         if (-not $roleResource) {
@@ -198,12 +259,12 @@ function Add-RoleScopeToAccessPackage {
                 accessPackageResource = @{
                     id           = $roleResource.Id
                     resourceType = "Built-in"
-                    originId     = $Role.RoleTemplateId
+                    originId     = $Role.TemplateId
                     originSystem = "DirectoryRole"
                 }
             }
             accessPackageResourceScope = @{
-                originId     = $Role.RoleTemplateId
+                originId     = $Role.TemplateId
                 originSystem = "DirectoryRole"
             }
         }
@@ -252,7 +313,7 @@ function Add-EntraRoleToCatalog {
     )
 
     Write-Host "🔍 Checking if role $($Role.DisplayName) exists in the catalog..."
-    $existingResource = Get-MgEntitlementManagementCatalogResource -AccessPackageCatalogId $CatalogId -Filter "originId eq '$($Role.RoleTemplateId)' and originSystem eq 'DirectoryRole'"
+    $existingResource = Get-MgEntitlementManagementCatalogResource -AccessPackageCatalogId $CatalogId -Filter "originId eq '$($Role.TemplateId)' and originSystem eq 'DirectoryRole'"
 
     if ($existingResource) {
         Write-Host "⚠️ Role $($Role.DisplayName) already exists in the catalog. Skipping." -ForegroundColor Yellow
@@ -266,7 +327,7 @@ function Add-EntraRoleToCatalog {
             displayName  = $Role.DisplayName
             description  = $Role.Description
             resourceType = "Built-in"
-            originId     = $Role.RoleTemplateId
+            originId     = $Role.TemplateId
             originSystem = "DirectoryRole"
         }
         justification         = "Adding Directory Role to Catalog"
@@ -537,15 +598,71 @@ function Add-PolicyToAccessPackage {
     }
 }
 
+# Function to retrieve all PIM role definitions
+function Get-AllPimRoleDefinitions {
+    Write-Host "🔍 Fetching all PIM role definitions..." -ForegroundColor Cyan
+    Write-Log "Fetching all PIM role definitions."
+    try {
+        $allRoles = Get-MgRoleManagementDirectoryRoleDefinition -All
+        if (-not $allRoles) {
+            Write-Host "❌ No role definitions found." -ForegroundColor Red
+            Write-Log "No role definitions found."
+            return @()
+        }
+
+        # Filter roles client-side
+        $pimRoleDefinitions = $allRoles | Where-Object {
+            $_.DisplayName -notin @("Global Administrator", "Company Administrator") -and
+            $_.IsBuiltIn -eq $true -and
+            $_.RolePermissions -ne $null
+        }
+
+        if (-not $pimRoleDefinitions) {
+            Write-Host "❌ No PIM role definitions found after filtering." -ForegroundColor Red
+            Write-Log "No PIM role definitions found after filtering."
+            return @()
+        }
+        Write-Host "🎭 Found $($pimRoleDefinitions.Count) PIM role definitions." -ForegroundColor Green
+        Write-Log "Found $($pimRoleDefinitions.Count) PIM role definitions."
+        return $pimRoleDefinitions
+    }
+    catch {
+        Write-Host "❌ Error fetching PIM role definitions: $_" -ForegroundColor Red
+        Write-Log "Error fetching PIM role definitions: $_"
+        return @()
+    }
+}
+
+# Function to select multiple roles using Out-ConsoleGridView
+function Select-Roles {
+    param (
+        [array]$Roles
+    )
+    Write-Host "🔮 Select the roles you want to create access packages for..." -ForegroundColor Yellow
+    Write-Log "Prompting user to select roles."
+    $selectedRoles = $Roles | Select-Object DisplayName, Id, TemplateId | Out-ConsoleGridView -Title "Select PIM Roles" -OutputMode Multiple
+    if (-not $selectedRoles) {
+        Write-Host "🚫 No roles selected. Exiting script." -ForegroundColor Red
+        Write-Log "No roles selected by user."
+        throw "No roles selected. Exiting script."
+    }
+    Write-Log "$($selectedRoles.DisplayName -join ', ') roles selected by user."
+    return $selectedRoles
+}
+
 # Main script section
 
-Write-Host "🧙‍♂️✨ Welcome to the Magical World of Entra ID Access Packages! ✨🧙‍♂️" -ForegroundColor Magenta
+Write-Host "🧙‍♂️✨ Welcome to the Enhanced Entra ID Access Packages Creation Script! ✨🧙‍♂️" -ForegroundColor Magenta
+Write-Log "Script started."
 
-# Import required modules
-Write-Host "📚 Summoning the ancient tomes of PowerShell..." -ForegroundColor Cyan
-Import-Module Microsoft.Graph.Authentication
-Import-Module Microsoft.Graph.Beta.Identity.Governance
-Import-Module Microsoft.Graph.Identity.DirectoryManagement
+# Ensure required modules are installed and imported
+Ensure-Modules
+
+# Authenticate to Microsoft Graph
+Write-Host "🔮 Connecting to Microsoft Graph..." -ForegroundColor Cyan
+Write-Log "Connecting to Microsoft Graph."
+
+Write-Host "🧙‍♂️✨ Welcome to the Magical World of Entra ID Access Packages! ✨🧙‍♂️" -ForegroundColor Magenta
 
 # Authenticate to Microsoft Graph
 Write-Host "🔮 Channeling the mystical energies of Microsoft Graph..." -ForegroundColor Cyan
@@ -570,12 +687,16 @@ $catalog = Get-OrCreateCatalog -CatalogName $catalogName
 
 # Get all Directory roles, excluding Global Administrator
 Write-Host "📜 Unrolling the ancient scroll of Directory roles..." -ForegroundColor Cyan
-$directoryRoles = Get-MgDirectoryRole -All | Where-Object { 
-    $null -ne $_.RoleTemplateId -and 
-    $_.DisplayName -ne "Global Administrator" -and 
-    $_.DisplayName -ne "Company Administrator"
+# Get and select roles
+$directoryRoles = Get-AllPimRoleDefinitions
+if ($directoryRoles.Count -eq 0) {
+    Write-Host "🚫 No Directory role definitions retrieved. Exiting script." -ForegroundColor Red
+    Write-Log "No Directory role definitions retrieved."
+    Disconnect-MgGraph
+    exit
 }
-Write-Host "🎭 Behold! We've discovered $($directoryRoles.Count) mystical roles!" -ForegroundColor Green
+$selectedRoles = Select-Roles -Roles $directoryRoles
+Write-Log "Selected roles: $($selectedRoles.DisplayName -join ', ')"
 
 # Select the cloud admin group
 Write-Host "☁️ Now, let's find the keepers of the cloud..." -ForegroundColor Yellow
@@ -597,7 +718,7 @@ $accessReviewSettings = Get-AccessReviewSettings -EntraIDUsers $entraIDUsers
 
 # Add each role to the catalog and create access packages
 Write-Host "🎨 Painting our masterpiece of access management..." -ForegroundColor Magenta
-foreach ($role in $directoryRoles) {
+foreach ($role in $selectedRoles ) {
     $roleName = $role.DisplayName
     Write-Host "🎭 Weaving the tale of $roleName..." -ForegroundColor Cyan
 
@@ -605,7 +726,7 @@ foreach ($role in $directoryRoles) {
         Write-Host "✨ Adding a sprinkle of $roleName to our magical catalog..."
         Add-EntraRoleToCatalog -CatalogId $catalog.Id -Role $role
 
-        $accessPackage = Get-OrCreateAccessPackage -RoleName $roleName -CatalogId $catalog.Id -RoleId $role.RoleTemplateId
+        $accessPackage = Get-OrCreateAccessPackage -RoleName $roleName -CatalogId $catalog.Id -RoleId $role.TemplateId
         
         Write-Host "🔓 Unlocking the secrets of $roleName..."
         Add-RoleScopeToAccessPackage -AccessPackageId $accessPackage.Id -Role $role -CatalogId $catalog.Id
