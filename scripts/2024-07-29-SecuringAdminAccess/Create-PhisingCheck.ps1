@@ -515,72 +515,6 @@ function Get-IAMExtensionProperty {
     }
 }
 
-function New-IAMExtensionProperty {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true, HelpMessage = 'The object ID of the application.')]
-        [ValidateNotNullOrEmpty()]
-        [string]$ApplicationId,
-    
-        [Parameter(Mandatory = $true, HelpMessage = 'The name of the extension property.')]
-        [ValidateNotNullOrEmpty()]
-        [string]$Name,
-    
-        [Parameter(Mandatory = $true, HelpMessage = 'The data type of the extension property (e.g., "Boolean", "String").')]
-        [ValidateSet('Binary', 'Boolean', 'DateTime', 'Integer', 'LargeInteger', 'String')]
-        [string]$DataType
-    )
-    
-    <#
-        .SYNOPSIS
-            Creates a custom extension property for an application if it doesn't already exist.
-    
-        .DESCRIPTION
-            This function checks if a custom extension property with the specified name and data type exists for the given application.
-            If it does not exist, it creates the extension property.
-    
-        .PARAMETER ApplicationId
-            The object ID of the application.
-    
-        .PARAMETER Name
-            The name of the extension property.
-    
-        .PARAMETER DataType
-            The data type of the extension property.
-    
-        .OUTPUTS
-            String
-    
-        .EXAMPLE
-            $extensionName = New-IAMExtensionProperty -ApplicationId $app.Id -Name "phishingResistantEnabled" -DataType "Boolean"
-        #>
-    
-    try {
-        # Retrieve existing extension properties
-        $extensions = Get-MgApplicationExtensionProperty -ApplicationId $ApplicationId -ErrorAction Stop
-    
-        $cleanAppId = $ApplicationId -replace '-', ''
-        $fullName = "extension_$($cleanAppId)_$Name"
-        $existing = $extensions | Where-Object { $_.Name -eq $fullName }
-    
-        if ($existing) {
-            Write-Verbose "Extension property '$Name' already exists as '$fullName'."
-        }
-        else {
-            $params = @{
-                Name          = $Name
-                DataType      = $DataType
-                TargetObjects = @('User')
-            }
-            $newExtension = New-MgApplicationExtensionProperty -ApplicationId $ApplicationId -BodyParameter $params -ErrorAction Stop
-            Write-Verbose "Created new extension property: $($newExtension.Name)"
-        }
-        return $fullName
-    }
-    catch {
-        Write-Error "Failed to create or retrieve extension property: $_"
-    }
-}
     
 function Get-IAMDynamicGroup {
     [CmdletBinding()]
@@ -957,6 +891,170 @@ finally {
 }
 
 
+function New-AuthenticationStrength {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        [string]$Description,
+        [Parameter(Mandatory = $true)]
+        [string[]]$AllowedCombinations
+    )
+
+    Write-Host "[DEBUG] Checking if Authentication Strength '$Name' exists..." -ForegroundColor Cyan
+    try {
+        $existingStrength = Get-MgBetaIdentityConditionalAccessAuthenticationStrengthPolicy -Filter "displayName eq '$Name'" -ErrorAction SilentlyContinue
+        if ($null -ne $existingStrength) {
+            Write-Host "[DEBUG] Authentication Strength '$Name' already exists. Strength ID: $($existingStrength.Id)" -ForegroundColor Green
+            return $existingStrength
+        }
+    }
+    catch {
+        Write-Host "[ERROR] Error while checking for existing Authentication Strength: $_" -ForegroundColor Red
+        exit
+    }
+
+    try {
+        Write-Host "[DEBUG] Creating new Authentication Strength with name '$Name'..." -ForegroundColor Cyan
+        $strengthParams = @{
+            DisplayName = $Name
+            Description = $Description
+            AllowedCombinations = $AllowedCombinations
+            CombinationConfigurations = @()
+        }
+        $authStrength = New-MgBetaIdentityConditionalAccessAuthenticationStrengthPolicy -BodyParameter $strengthParams -ErrorAction Stop
+        Write-Host "[DEBUG] Authentication Strength '$Name' created successfully. Strength ID: $($authStrength.Id)" -ForegroundColor Green
+        return $authStrength
+    }
+    catch {
+        Write-Host "[ERROR] Failed to create Authentication Strength. Error: $_" -ForegroundColor Red
+        exit
+    }
+}
+
+function Get-AuthenticationStrength {
+    param (
+        [Parameter(Mandatory = $false)]
+        [string]$Name
+    )
+
+    Write-Host "[DEBUG] Retrieving Authentication Strength..." -ForegroundColor Cyan
+    try {
+        if ($Name) {
+            $authStrength = Get-MgBetaIdentityConditionalAccessAuthenticationStrengthPolicy -Filter "displayName eq '$Name'" -ErrorAction Stop
+            if ($null -eq $authStrength) {
+                Write-Host "[DEBUG] No Authentication Strength found with the name '$Name'." -ForegroundColor Yellow
+            } else {
+                Write-Host "[DEBUG] Authentication Strength '$Name' found. Strength ID: $($authStrength.Id)" -ForegroundColor Green
+            }
+            return $authStrength
+        } else {
+            $authStrengths = Get-MgBetaIdentityConditionalAccessAuthenticationStrengthPolicy -ErrorAction Stop
+            Write-Host "[DEBUG] Retrieved all Authentication Strengths." -ForegroundColor Green
+            return $authStrengths
+        }
+    }
+    catch {
+        Write-Host "[ERROR] Failed to retrieve Authentication Strength. Error: $_" -ForegroundColor Red
+        exit
+    }
+}
+
+function New-ConditionalAccessPolicy {
+    param (
+        [Parameter(Mandatory = $true)]
+        [hashtable]$PolicyParams
+    )
+
+    Write-Host "[DEBUG] Creating new Conditional Access policy..." -ForegroundColor Cyan
+    try {
+        New-MgIdentityConditionalAccessPolicy -BodyParameter $PolicyParams -ErrorAction Stop
+        Write-Host "Policy '$($PolicyParams.DisplayName)' created successfully." -ForegroundColor Green
+    }
+    catch {
+        Write-Host "[ERROR] Failed to create policy '$($PolicyParams.DisplayName)': $_" -ForegroundColor Red
+    }
+}
+
+function Get-GroupIdByName {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$GroupName,
+        [Parameter(Mandatory = $true)]
+        [array]$Groups
+    )
+
+    $group = $Groups | Where-Object { $_.DisplayName -eq $GroupName }
+    if ($group) {
+        return $group.Id
+    }
+    else {
+        Write-Host "[ERROR] Group '$GroupName' not found." -ForegroundColor Yellow
+        return $null
+    }
+}
+
+function Update-ConditionalAccessPolicy {
+    param (
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Policy,
+        [Parameter(Mandatory = $true)]
+        [hashtable]$ExistingPolicy
+    )
+
+    Write-Host "[DEBUG] Updating Conditional Access policy '$($Policy.DisplayName)'..." -ForegroundColor Cyan
+    try {
+        Update-MgIdentityConditionalAccessPolicy -ConditionalAccessPolicyId $ExistingPolicy.Id -BodyParameter $Policy -ErrorAction Stop
+        Write-Host "Policy '$($Policy.DisplayName)' updated successfully." -ForegroundColor Green
+    }
+    catch {
+        Write-Host "[ERROR] Failed to update policy '$($Policy.DisplayName)': $_" -ForegroundColor Red
+        Add-Content -Path ".\failed_policies.log" -Value "Failed to update policy '$($Policy.DisplayName)': $_"
+    }
+}
+
+function New-ConditionalAccessPoliciesNew {
+    param (
+        [Parameter(Mandatory = $true)]
+        [array]$Policies
+    )
+
+    $groups = Get-MgGroup -All | Select-Object DisplayName, Id
+    Write-Host "[DEBUG] Retrieved all groups for Conditional Access policies." -ForegroundColor Cyan
+
+    foreach ($policy in $Policies) {
+        if ($policy.Conditions.Users.IncludeGroups) {
+            $policy.Conditions.Users.IncludeGroups = $policy.Conditions.Users.IncludeGroups | ForEach-Object { Get-GroupIdByName -GroupName $_ -Groups $groups }
+        }
+        if ($policy.Conditions.Users.ExcludeGroups) {
+            $policy.Conditions.Users.ExcludeGroups = $policy.Conditions.Users.ExcludeGroups | ForEach-Object { Get-GroupIdByName -GroupName $_ -Groups $groups }
+        }
+    }
+
+    $existingPolicies = Get-MgIdentityConditionalAccessPolicy -All
+    Write-Host "[DEBUG] Retrieved existing Conditional Access policies." -ForegroundColor Cyan
+
+    foreach ($policy in $Policies) {
+        $existingPolicy = $existingPolicies | Where-Object { $_.DisplayName -eq $policy.DisplayName }
+        
+        if ($existingPolicy) {
+            Write-Host "Policy '$($policy.DisplayName)' already exists. Checking settings..." -ForegroundColor Yellow
+            if ($existingPolicy.Conditions -ne $policy.Conditions -or $existingPolicy.State -ne $policy.State) {
+                Write-Host "Policy '$($policy.DisplayName)' settings differ. Updating policy..." -ForegroundColor Cyan
+                Update-ConditionalAccessPolicy -Policy $policy -ExistingPolicy $existingPolicy
+            }
+            else {
+                Write-Host "Policy '$($policy.DisplayName)' settings are identical. No update needed." -ForegroundColor Green
+            }
+        }
+        else {
+            Write-Host "Creating policy '$($policy.DisplayName)'..." -ForegroundColor Cyan
+            New-ConditionalAccessPolicy -PolicyParams $policy
+        }
+    }
+}
+
+
 # ------------------------------
 
 
@@ -1067,7 +1165,14 @@ else {
 # Update phishing-resistant status
 Write-Host "[INFO] Updating phishing-resistant status for the selected user..." -ForegroundColor Cyan
 $selectedGroups = Get-MgGroup -All | Out-ConsoleGridView -OutputMode Multiple -Title "Select the admin group"
-Update-IAMPhishingResistantStatus -Object $selectedGroups[0] -ObjectType "Group" -PhishingResistantEnabledAttr $enabledAttr -PhishingResistantLastCheckedAttr $lastCheckedAttr -PhishingResistantStatusAttr $statusAttr
+if ($selectedGroups.Count -gt 0) {
+    foreach ($group in $selectedGroups) {
+        Update-IAMPhishingResistantStatus -Object $group -ObjectType "Group" -PhishingResistantEnabledAttr $enabledAttr -PhishingResistantLastCheckedAttr $lastCheckedAttr -PhishingResistantStatusAttr $statusAttr
+    }
+}
+else {
+    Write-Host "No groups selected. Exiting..."
+}
 
 # Create daily checker script
 $script = New-IAMhourlyCheckerScript -AppId $app.Id `
@@ -1075,3 +1180,66 @@ $script = New-IAMhourlyCheckerScript -AppId $app.Id `
     -PhishingResistantLastCheckedAttr $lastCheckedAttr `
     -PhishingResistantStatusAttr $statusAttr `
     -Groups $selectedGroups
+
+# Step: Create Authentication Strength
+$authStrengthParams = @{
+    Name = "Phishing-resistant-firsttimeUse"
+    Description = "Authentication strength for first-time use with phishing-resistant methods"
+    AllowedCombinations = @("fido2", "windowsHelloForBusiness", "x509CertificateMultiFactor", "temporaryAccessPassOneTime")
+}
+$authStrength = New-AuthenticationStrength @authStrengthParams
+Write-Host "Authentication Strength created: $($authStrength.DisplayName)"
+
+
+$caPolicy1Params = @{
+    DisplayName   = "CA109-Admins-BaseProtection-AllApps-AnyPlatform-PhishingResistant"
+    State         = "disabled"
+    Conditions    = @{
+        ClientAppTypes = @("all")
+        Applications   = @{ IncludeApplications = @("All") }
+        Users          = @{
+            IncludeGroups = @("ca-Persona--Admins")
+            ExcludeGroups = @(
+                "ca-BreakGlassAccounts",
+                "ca-Persona--Admins-BaseProtection-Exclusions",
+                "ca-Persona--Microsoft365ServiceAccounts",
+                "ca-Persona--AzureServiceAccounts",
+                "ca-Persona--CorpServiceAccounts",
+                "ca-Persona--admins-PhishingResistant-Exclusions"
+            )
+        }
+    }
+    GrantControls = @{
+        operator               = "AND"
+        builtInControls        = @()
+        authenticationStrength = @{ id = "00000000-0000-0000-0000-000000000004" }
+    }
+}
+New-ConditionalAccessPoliciesNew -Params $caPolicy1Params
+
+$caPolicy2Params = @{
+    DisplayName   = "CA110-Admins-BaseProtection-AllApps-AnyPlatform-TapFirstTimeUse"
+    State         = "disabled"
+    Conditions    = @{
+        ClientAppTypes = @("all")
+        Applications   = @{ IncludeApplications = @("All") }
+        Users          = @{
+            IncludeGroups = @("ca-Persona--Admins")
+            ExcludeGroups = @(
+                "ca-BreakGlassAccounts",
+                "ca-Persona-Admins-BaseProtection-Exclusions",
+                "ca-Persona-Microsoft365ServiceAccounts",
+                "ca-Persona-AzureServiceAccounts",
+                "ca-Persona-CorpServiceAccounts",
+                "ca-Persona-admins-PhishingResistant-Inclusions"
+            )
+        }
+    }
+    GrantControls = @{
+        operator               = "AND"
+        builtInControls        = @()
+        authenticationStrength = @{ id = $authStrength.Id }
+    }
+}
+New-ConditionalAccessPoliciesNew -Params $caPolicy2Params
+
