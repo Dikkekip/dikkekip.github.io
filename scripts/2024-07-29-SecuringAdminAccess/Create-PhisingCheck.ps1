@@ -1201,11 +1201,11 @@ $caPolicy1Params = @{
             IncludeGroups = @("ca-Persona--Admins")
             ExcludeGroups = @(
                 "ca-BreakGlassAccounts",
-                "ca-Persona--Admins-BaseProtection-Exclusions",
-                "ca-Persona--Microsoft365ServiceAccounts",
-                "ca-Persona--AzureServiceAccounts",
-                "ca-Persona--CorpServiceAccounts",
-                "ca-Persona--admins-PhishingResistant-Exclusions"
+                "ca-Persona-Admins-BaseProtection-Exclusions",
+                "ca-Persona-Microsoft365ServiceAccounts",
+                "ca-Persona-AzureServiceAccounts",
+                "ca-Persona-CorpServiceAccounts",
+                "ca-Persona-admins-PhishingResistant-Exclusions"
             )
         }
     }
