@@ -2,7 +2,7 @@
 layout: post
 title:  "How to Secure Admin Access! - Part 3"
 date:   2024-11-26 23:00:00 +0200
-description: "Onboarding and Offboarding Admins with Azure Automation"
+description: "Onboarding and Offboarding Passkey Phishing-Resistant MFA for Admins with Azure Automation"
 categories: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure, DevOps Practices]
 tags: [Entra ID, Cloud Security, Access Management, Azure Automation, IT Security, Cloud Administration, Microsoft Azure]
 image:
