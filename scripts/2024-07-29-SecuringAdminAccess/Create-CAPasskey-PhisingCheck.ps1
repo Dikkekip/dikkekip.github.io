@@ -1013,7 +1013,7 @@ function Update-ConditionalAccessPolicy {
     }
 }
 
-function New-ConditionalAccessPoliciesNew {
+function New-ConditionalAccessPolicies {
     param (
         [Parameter(Mandatory = $true)]
         [array]$Policies
@@ -1215,7 +1215,7 @@ $caPolicy1Params = @{
         authenticationStrength = @{ id = "00000000-0000-0000-0000-000000000004" }
     }
 }
-New-ConditionalAccessPoliciesNew -Params $caPolicy1Params
+New-ConditionalAccessPolicies -Params $caPolicy1Params
 
 $caPolicy2Params = @{
     DisplayName   = "CA110-Admins-BaseProtection-AllApps-AnyPlatform-TapFirstTimeUse"
@@ -1241,5 +1241,5 @@ $caPolicy2Params = @{
         authenticationStrength = @{ id = $authStrength.Id }
     }
 }
-New-ConditionalAccessPoliciesNew -Params $caPolicy2Params
+New-ConditionalAccessPolicies -Params $caPolicy2Params
 
