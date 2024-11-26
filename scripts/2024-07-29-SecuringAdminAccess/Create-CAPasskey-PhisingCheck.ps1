@@ -25,6 +25,12 @@ $appDisplayName = "IAM Custom Attributes Manager"
 
 $requiredModules = @(
     "Microsoft.Graph.Beta.Identity.DirectoryManagement"
+    "Microsoft.Graph.Applications"
+    "Microsoft.Graph.Authentication"
+    "Microsoft.Graph.Groups"
+    "Microsoft.Graph.Users"
+    "Microsoft.PowerShell.ConsoleGuiTools"
+    "Microsoft.Graph.Beta.Identity.SignIns"
 )
 
 #functions
@@ -999,7 +1005,7 @@ function Update-ConditionalAccessPolicy {
         [Parameter(Mandatory = $true)]
         [hashtable]$Policy,
         [Parameter(Mandatory = $true)]
-        [hashtable]$ExistingPolicy
+        $ExistingPolicy
     )
 
     Write-Host "[DEBUG] Updating Conditional Access policy '$($Policy.DisplayName)'..." -ForegroundColor Cyan
@@ -1183,7 +1189,7 @@ $script = New-IAMhourlyCheckerScript -AppId $app.Id `
 
 # Step: Create Authentication Strength
 $authStrengthParams = @{
-    Name = "Phishing-resistant-firsttimeUse"
+    Name = "Phishing-resistant+tap"
     Description = "Authentication strength for first-time use with phishing-resistant methods"
     AllowedCombinations = @("fido2", "windowsHelloForBusiness", "x509CertificateMultiFactor", "temporaryAccessPassOneTime")
 }
@@ -1215,7 +1221,7 @@ $caPolicy1Params = @{
         authenticationStrength = @{ id = "00000000-0000-0000-0000-000000000004" }
     }
 }
-New-ConditionalAccessPolicies -Params $caPolicy1Params
+New-ConditionalAccessPolicies -Policies $caPolicy1Params
 
 $caPolicy2Params = @{
     DisplayName   = "CA110-Admins-BaseProtection-AllApps-AnyPlatform-TapFirstTimeUse"
@@ -1241,5 +1247,5 @@ $caPolicy2Params = @{
         authenticationStrength = @{ id = $authStrength.Id }
     }
 }
-New-ConditionalAccessPolicies -Params $caPolicy2Params
+New-ConditionalAccessPolicies -Policies $caPolicy2Params
 
