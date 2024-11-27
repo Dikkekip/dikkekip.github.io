@@ -96,14 +96,15 @@ This limitation often results in frustrating errors when attempting to onboard u
 ![Error 2](/assets/img/SecuringAdminAccess/image-3.png)  
 ![Error 3](/assets/img/SecuringAdminAccess/image-4.png)
 
----
+
 
 ### 💡 Key Takeaway
 
-While ScubaGear’s recommendation is clear, ensuring your **resource tenants** meet all prerequisites for phishing-resistant MFA requires thoughtful planning. Stay tuned as we explore how to automate this process and overcome these challenges in the next sections. 🛡️✨
+While ScubaGear’s recommendation is clear, ensuring your **resource tenants** meet all prerequisites for phishing-resistant MFA requires thoughtful planning. Lets automate this process and overcome these challenges in the next sections. 🛡️✨
 
+---
 
-# But There Is a Solution! Let’s Automate the Onboarding and Offboarding of Admin Phishing-Resistant MFA with PowerShell! 🧙‍♂️✨
+## But There Is a Solution! Let’s Automate the Onboarding and Offboarding of Admin Phishing-Resistant MFA With PowerShell! 🧙‍♂️✨
 
 Fear not, fellow IT wizards! We have automation magic at our disposal. Here’s the plan to streamline the onboarding and offboarding process for admins using **phishing-resistant MFA**.
 
@@ -115,27 +116,31 @@ Fear not, fellow IT wizards! We have automation magic at our disposal. Here’s 
 
 ---
 
-### Step 1: Setting the Baseline
+### ⚖️ Setting the Baseline
 
 Before diving into the script, we need to establish a solid foundation using **Administrative Units (AUs)**. Admin accounts should belong to **Restricted Management AUs**. This ensures that Entra ID roles apply to these accounts in isolation, keeping them secure and separate from tenant-level roles.
 
-#### Why Restricted Management AUs?  
+#### 🛡️ Why Restricted Management AUs? 
+
 This setup provides:
 - Scoped management of admin accounts.
 - Reduced exposure to tenant-wide permissions.
 - fine-grained control over Entra ID roles.
 
 #### Script Links:
-- [Create-CaPasskeyBaseline - GitHub](https://github.com/Dikkekip/dikkekip.github.io/blob/main/scripts/2024-07-29-SecuringAdminAccess/Create-PhisingCheck.ps1)  
-- [Create-CaPasskeyBaseline - RAW](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-PhisingCheck.ps1)  
+- [Create-CaPasskeyBaseline - GitHub](https://github.com/Dikkekip/dikkekip.github.io/blob/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPasskey-AutomationAccount.ps1)  
+- [Create-CaPasskeyBaseline - RAW](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPasskey-AutomationAccount.ps1)  
+
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
+> **Note**: Due to the script's length, please refer to the script at the provided link.
+{: .prompt-info }
+<!-- markdownlint-restore --> Due to the script's length, please refer to the script at the provided link.
+
 
 ---
 
-> **Note:** The script is quite large, so you’ll find the full version at the links above. Below, I’ll showcase key snippets.
-
----
-
-### Provisioning Administrative Units
+### 🤖 Provisioning Administrative Units
 
 Here’s how you can create and assign roles to an AU:
 
@@ -152,7 +157,7 @@ Add-MembersToAU -AUId $administrativeUnit.Id
 This script creates an Administrative Unit specifically for platform admins and assigns members to it.
 ![create AU](../assets/img/SecuringAdminAccess/AU.png)
 
-## 📚 Step 2: Creating Custom Attributes
+## 🪄📚 Creating Custom Attributes
 
 To make Conditional Access policies truly effective, we need to add **custom attributes** to our users. Why? Because Conditional Access can only target **Users** and **Groups**; it doesn’t inherently know the specific MFA options registered for each user.
 
@@ -164,7 +169,7 @@ To work around this limitation, we turn to [Custom Extension Attributes](https:/
 
 ---
 
-### The Plan: Leveraging Custom Extension Attributes
+### Leveraging Custom Extension Attributes
 
 Now that we’ve established the need for **Custom Extension Attributes**, here’s how we’ll implement them:
 
@@ -181,8 +186,8 @@ Now that we’ve established the need for **Custom Extension Attributes**, here�
 
 The full script to set up custom attributes is quite extensive, so I’ve linked it here for reference:  
 
-- [Create-CaPasskeyBaseline - GitHub](https://github.com/Dikkekip/dikkekip.github.io/blob/main/scripts/2024-07-29-SecuringAdminAccess/Create-PhisingCheck.ps1)  
-- [Create-CaPasskeyBaseline - RAW](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-PhisingCheck.ps1)  
+- [Create-CaPasskeyBaseline - GitHub](https://github.com/Dikkekip/dikkekip.github.io/blob/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPasskey-AutomationAccount.ps1)  
+- [Create-CaPasskeyBaseline - RAW](https://raw.githubusercontent.com/Dikkekip/dikkekip.github.io/main/scripts/2024-07-29-SecuringAdminAccess/Create-CAPasskey-AutomationAccount.ps1)  
 
 ---
 
@@ -221,7 +226,7 @@ Now we can find the three custom attributes created on the application object in
 
 ---
 
-## 📚 Checking User MFA Values and Populating Attributes
+## ⚙️⚡ Checking User MFA Values and Populating Attributes
 
 With the custom attributes now in place, the next step is to populate them with the correct values for each user. This will allow Conditional Access policies to dynamically target users based on their MFA settings.
 
@@ -399,13 +404,13 @@ finally {
 ```
 
 
-## Updating the Users' Attributes to Include the MFA Settings
+## 🧩 Updating the Users' Attributes to Include the MFA Settings
 
 With the custom attributes and Administrative Unit in place, the next step is to update user attributes with their MFA settings. This allows Conditional Access policies to dynamically target users based on their MFA configurations.
 
 ---
 
-### Creating Dynamic Entra ID Groups
+### 🎯 Creating Dynamic Entra ID Groups
 
 The first step in this process is creating **Dynamic Entra ID Groups**. These groups will be based on the custom attributes we created earlier and allow us to segregate users based on their MFA readiness or status.  
 
