@@ -622,7 +622,7 @@ $caPolicy1Params = @{
         ClientAppTypes = @("all")
         Applications   = @{ IncludeApplications = @("All") }
         Users          = @{
-            IncludeGroups = @("ca-Persona--Admins")
+            IncludeGroups = @("ca-Persona-Admins")
             ExcludeGroups = @(
                 "ca-BreakGlassAccounts",
                 "ca-Persona-Admins-BaseProtection-Exclusions",
@@ -648,7 +648,7 @@ $caPolicy2Params = @{
         ClientAppTypes = @("all")
         Applications   = @{ IncludeApplications = @("All") }
         Users          = @{
-            IncludeGroups = @("ca-Persona--Admins")
+            IncludeGroups = @("ca-Persona-Admins")
             ExcludeGroups = @(
                 "ca-BreakGlassAccounts",
                 "ca-Persona-Admins-BaseProtection-Exclusions",
