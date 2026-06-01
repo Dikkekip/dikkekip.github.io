@@ -8,7 +8,7 @@ theme: jekyll-theme-chirpy
 # otherwise, the layout language will use the default value of 'en'.
 lang: en
 
-# Change to your timezone › https://kevinnovak.github.io/Time-Zone-Picker
+# Change to your timezone › https://zones.arilyn.cc
 timezone: Europe/Oslo
 
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
@@ -16,39 +16,66 @@ timezone: Europe/Oslo
 
 title: Adventures in Cloud and Code # the main title
 
-tagline: Insights from a Cloud & DevOps Architect # it will display as the sub-title
+tagline: Insights from a Cloud & DevOps Architect # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
   Join Maarten Rosier, a Cloud & DevOps Architect, as he shares his insights and experiences with Azure, Bicep, Infrastructure as Code, Entra ID, and Intune/AVD. Follow along as he explores the latest developments in these technologies and shares his knowledge and expertise. Whether you're a fellow tech enthusiast or just curious about the world of cloud and code, this blog is for you.
 
 # Fill in the protocol & hostname for your site.
-# e.g. 'https://username.github.io', note that it does not end with a '/'.
+# E.g. 'https://username.github.io', note that it does not end with a '/'.
 url: "https://dikkekip.github.io"
 
 github:
-  username: dikkekip # change to your github username
+  username: dikkekip # change to your GitHub username
 
 linkedin:
   username: maarten-rosier-b3979551
+
 social:
   # Change to your full name.
   # It will be displayed as the default author of the posts and the copyright owner in the Footer
   name: Maarten Robert Rosier
   email: info@maartenrosier.com # change to your email address
+  fediverse_handle: # fill in your fediverse handle. E.g. "@username@domain.com"
   links:
     # The first element serves as the copyright owner's link
-    - https://github.com/dikkekip # change to your github homepage
+    - https://github.com/dikkekip # change to your GitHub homepage
+    - https://www.linkedin.com/in/maarten-rosier-b3979551
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
-    - https://www.linkedin.com/in/maarten-rosier-b3979551
 
-google_site_verification: at5n6ubfvaa6 # fill in to your verification string
+# Site Verification Settings
+webmaster_verifications:
+  google: at5n6ubfvaa6 # fill in your Google verification code
+  bing: # fill in your Bing verification code
+  alexa: # fill in your Alexa verification code
+  yandex: # fill in your Yandex verification code
+  baidu: # fill in your Baidu verification code
+  facebook: # fill in your Facebook verification code
 
 # ↑ --------------------------
 # The end of `jekyll-seo-tag` settings
+
+# Web Analytics Settings
 analytics:
   google:
-    id: G-5K0M5XGRBN
+    id: G-5K0M5XGRBN # fill in your Google Analytics ID
+  goatcounter:
+    id: # fill in your GoatCounter ID
+  umami:
+    id: # fill in your Umami ID
+    domain: # fill in your Umami domain
+  matomo:
+    id: # fill in your Matomo ID
+    domain: # fill in your Matomo domain
+  cloudflare:
+    id: # fill in your Cloudflare Web Analytics token
+  fathom:
+    id: # fill in your Fathom Site ID
+
+# Page views settings
+pageviews:
+  provider: # now only supports 'goatcounter'
 
 # Prefer color scheme setting.
 #
@@ -58,17 +85,17 @@ analytics:
 #
 # Available options:
 #
-#     light  - Use the light color scheme
-#     dark   - Use the dark color scheme
+#     light — Use the light color scheme
+#     dark — Use the dark color scheme
 #
 theme_mode: dark
 
-# The CDN endpoint for images.
+# The CDN endpoint for media resources.
 # Notice that once it is assigned, the CDN url
-# will be added to all image (site avatar & posts' images) paths starting with '/'
+# will be added to all media resources (site avatar, posts' images, audio and video files) paths starting with '/'
 #
 # e.g. 'https://cdn.com'
-img_cdn:
+cdn:
 
 # the avatar on sidebar, support local or CORS resources
 avatar: assets/img/Adventures-in-Cloud-and-Code.png
@@ -82,7 +109,7 @@ toc: true
 
 comments:
   # Global switch for the post-comment system. Keeping it empty means disabled.
-  provider: giscus
+  provider: giscus # [disqus | utterances | giscus]
   # The provider options are as follows:
   disqus:
     shortname: # fill with the Disqus shortname. › https://help.disqus.com/en/articles/1717111-what-s-a-shortname
@@ -92,15 +119,15 @@ comments:
     issue_term: # < url | pathname | title | ...>
   # Giscus options › https://giscus.app
   giscus:
-    repo: "Dikkekip/dikkekip.github.io"
+    repo: "Dikkekip/dikkekip.github.io" # <gh-username>/<repo>
     repo_id: "R_kgDOLIiTTQ"
     category: "Posts"
     category_id: "DIC_kwDOLIiTTc4Cc0Ud"
-    mapping: #
+    mapping: # optional, default to 'pathname'
     strict: # optional, default to '0'
     input_position: # optional, default to 'bottom'
     lang: # optional, default to the value of `site.lang`
-    reactions_enabled: "1"
+    reactions_enabled: "1" # optional, default to the value of `1`
 
 # Self-hosted static assets, optional › https://github.com/cotes2020/chirpy-static-assets
 assets:
@@ -108,10 +135,17 @@ assets:
     enabled: # boolean, keep empty means false
     # specify the Jekyll environment, empty means both
     # only works if `assets.self_host.enabled` is 'true'
-    env: # [development|production]
+    env: # [development | production]
 
 pwa:
-  enabled: true # the option for PWA feature
+  enabled: true # The option for PWA feature (installable)
+  cache:
+    enabled: true # The option for PWA offline cache
+    # Paths defined here will be excluded from the PWA cache.
+    # Usually its value is the `baseurl` of another website that
+    # shares the same domain name as the current website.
+    deny_paths:
+      # - "/example"  # URLs match `<SITE_URL>/example/*` will not be cached by the PWA
 
 paginate: 10
 
@@ -121,6 +155,7 @@ baseurl: ""
 # ------------ The following options are not recommended to be modified ------------------
 
 kramdown:
+  footnote_backlink: "&#8617;&#xfe0e;"
   syntax_highlighter: rouge
   syntax_highlighter_opts: # Rouge Options › https://github.com/jneen/rouge#full-options
     css_class: highlight
@@ -157,14 +192,6 @@ defaults:
     values:
       layout: page
       permalink: /:title/
-  - scope:
-      path: assets/img/favicons
-    values:
-      swcache: true
-  - scope:
-      path: assets/js/dist
-    values:
-      swcache: true
 
 sass:
   style: compressed
@@ -185,8 +212,9 @@ exclude:
   - tools
   - README.md
   - LICENSE
-  - rollup.config.js
-  - package*.json
+  - purgecss.js
+  - "*.config.js"
+  - "package*.json"
 
 jekyll-archives:
   enabled: [categories, tags]
