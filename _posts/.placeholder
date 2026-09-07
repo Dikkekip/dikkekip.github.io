@@ -1,1 +1,330 @@
 
+# AutoCode: I Have the Credits. I Don’t Always Have the Time.
+
+GPT-6 Astra is out, and despite a rocky launch, I’ve been coding whenever I’ve had a little extra time available. And honestly, in my own projects, the improvement is real. Tasks run for longer, more prompts deliver something genuinely useful in one shot, frontend UI has finally taken a step forward, and computer use feels much faster.
+
+For someone who has always worked more on the architectural side of cloud, this is absolutely amazing. Bringing ideas to life and having agents build software that I previously needed developers to create is something I’m still not entirely used to.
+
+But before I get into what I’ve been building, there is another side to all this that I think deserves some attention.
+
+## Great technology. Some pretty big economic questions.
+
+The models are improving, but the discussion around them sometimes seems stuck on opinions formed a few months ago. Meanwhile, the sceptics are getting louder, the AI bubble discussion keeps coming back, and the economics of the labs are becoming difficult to separate from the technology itself.
+
+And I think we should pay attention to that.
+
+The compute commitments are enormous. The infrastructure spending is enormous. At some point, the revenue has to justify it, which means businesses—and, to some extent, people like us who build and maintain technology—have to find enough valuable things to do with all that compute.
+
+Token-based billing makes this particularly interesting. Once you start running agents continuously, “let it have another go” becomes an architectural and financial decision. How many passes does this task actually need? Which model should do them? Did the additional inference make the result better, or did we just spend more money arriving at roughly the same answer?
+
+That begs the question: is the technology, and especially the current approach to LLMs, enough to deliver the return on all that CAPEX?
+
+Or will open-weight models, including those coming out of China, democratise the technology to such an extent that the established software giants find themselves competing with a startup, a couple of employees, and an army of agents?
+
+Those possibilities aren’t necessarily mutually exclusive. AI could become incredibly useful while making parts of the software industry much less profitable.
+
+Once the initial AI frenzy and token-maxxing wear off, I think there is a more interesting question underneath: how does this become revolutionary beyond IT, cloud, software development, and operations?
+
+Yes, technology is everywhere, and improving how we build it matters. I have no doubt that AI will change our industry. But the economic expectations seem to require something bigger than all of us becoming very good at generating software.
+
+When that happens, what capabilities get us there, and which types of models actually deliver it—I don’t think we know yet.
+
+Anyway, back to my considerably smaller problem.
+
+## Life doesn’t leave me available to prompt all evening
+
+I’m a single dad with a four year old running around. After a full day of work, barnehage pickup, dinner, and bedtime, those two hours left in the day might simply be better spent winding down than opening my terminal, Codex, or T3 Code and starting another session on a hobby project.
+
+The ideas are still there. The enthusiasm is still there. The energy and uninterrupted time? Not always.
+
+This left me in a slightly ridiculous situation with AI subscriptions. On the cheaper plans, I ran out of usage far too quickly. But on my Pro-tier subscriptions, I sometimes had weekly capacity left over because I simply hadn’t had time to use it. Other things were more important that day.
+
+OpenClaw and Hermes came along, and I enjoyed working with them. But in the workflows I had set up, I still had to think about the product, decide what should happen next, and write the prompts.
+
+Putting that interaction on my phone didn’t really solve anything either. Staring at a screen and talking to an AI while spending time with my daughter isn’t exactly the parenting example I’m trying to set.
+
+So I started wondering: can’t the agents do more of this themselves?
+
+I know a shit ton about cloud. That doesn’t mean I know the best way to combine a TypeScript frontend with a Python backend using FastAPI, or that I’ll automatically write the right prompt to improve that architecture. Sometimes I don’t have the relevant skill set to know what I should be asking in the first place.
+
+Surely this giant neural network, trained on considerably more software engineering material than I will ever read, should have some useful ideas?
+
+Right?
+
+And if I don’t have the time, but I do have the capacity available, I’m sure as hell not going to let it go unused without at least trying to make something useful happen while I’m busy parenting.
+
+## So I started building AutoCode
+
+I began looking at autonomous coding and how much of the process of building a product could actually be handed over to agents.
+
+There are plenty of projects and approaches in this space: Paperclip, loop engineering, goose, DevClaw, AutoAgent, AgentScope, to name a few. I’m clearly not the first person to ask whether we can stop sitting between every step of the process.
+
+But my setup was a bit messy. I had multiple accounts, some inference through Google, most of my usage with OpenAI, and access to open-weight models through AI Foundry. I wanted to use different parts of that capacity for different kinds of work.
+
+I hadn’t found something that quite fitted how I wanted to experiment. And, after all, part of the reason for doing this was to learn. Grabbing a project from GitHub would have been perfectly sensible, but building the thing was part of the fun.
+
+So I decided to build on top of OpenClaw. I was already familiar with the setup, it worked well for me, and I had control over the skills.
+
+The question was fairly straightforward: instead of me constantly coming up with prompts, could the agents inspect the project, identify useful work, write the prompts, and then hand them over to coding agents?
+
+That became **AutoCode**.
+
+To be clear, this is very experimental. I’m not expecting 80,000 GitHub stars or claiming that I’ve solved autonomous software engineering. But after the latest round of work with Astra, I wanted to share it and get some feedback.
+
+Because while the models have improved a lot, fully letting go of the ropes still hasn’t worked consistently enough for me to say, “There we go, software development is solved.”
+
+## The framework
+
+What I’ve tried to build is a persona-based approach, with model inference at each stage where there is a decision to make, rather than one enormous prompt that tries to do everything.
+
+The personas are configurable per codebase. A backend service needs different attention from a frontend-heavy application, and I don’t want every repository to receive the same generic instructions about what “better” looks like.
+
+In practice, a persona has goals, allowed repository paths, success observations, a weight for how often it gets selected, and an optional investigation brief. My application has domain personas alongside backend, frontend, and architecture roles. Yours should reflect your product. There is no particular reason your shopping-list app needs my legal-workflow specialist.
+
+The intended starting point is the codebase and its operational logs. The current native investigation path is more specific: it supplies committed source, persona instructions, and recent decisions and workflow outcomes, including review findings and blockers. A general feed of live application logs is still something to build out. An assessment agent looks at that context through a particular persona, with an instruction along the lines of:
+
+> You are a backend developer. Review this project and identify a concrete improvement worth making.
+
+But that first agent isn’t supposed to immediately start coding. Its job is to create a useful implementation prompt.
+
+For that, I use a prompt-writing step I’ve called *Promptify*. In the newer native workflow, the actual `prompt-engineering-expert` skill content is supplied to the investigation session. The idea is to turn an initial assessment into a specific task that another agent can actually execute, rather than passing along something vague like “make the backend better” and hoping for the best.
+
+The resulting proposal needs a concrete problem, the user workflow it affects, inspected source evidence, the intended change, alternatives, non-goals, and a way to verify each acceptance criterion. The framework records the inspected commit, file hashes, session identity, and skill hash. That tells us where the prompt came from. It does not magically make it a good prompt.
+
+The prompt is saved, and a memory system keeps track of the work that has been proposed or issued. This is intended to prevent duplicate tasks and agents repeatedly rediscovering the same “great idea.” Intended is an important word here; I’m not claiming that adding memory magically makes repetition disappear.
+
+The task then ends up in the work queue. Originally that was my dispatcher queue. The newer integration uses OpenClaw’s native Workboard and Automations for cards, session ownership, scheduling, and managed worktrees. AutoCode adds the persona investigation, selection, verification, and release logic around them.
+
+The project’s `.openclaw/native-evidence.db` stores proposals, decisions, review evidence, and deployment receipts. It is an evidence journal, not another competing scheduler. Large prompts stay there too, and assigned agents retrieve their full context through `autocode_context` instead of relying on a truncated card description.
+
+### Different models for different jobs
+
+I’ve also been experimenting with using different models throughout the process.
+
+Some of the open-weight options in my setup are significantly cheaper and do a reasonable job on lighter tasks. My thinking is that I don’t necessarily need the most capable—and most expensive—model for every assessment or supporting step. I would rather reserve that capacity for the actual feature-building work.
+
+But cheaper tokens don’t automatically mean cheaper work.
+
+A model might cost less per token while needing more attempts, longer conversations, or another model to clean up after it. That’s not much of a saving.
+
+So this is something I’m still figuring out: which parts of the process genuinely benefit from a frontier model, and which can be handled well enough by something cheaper? The useful comparison is what it costs to finish a task properly, not just what the token price looks like.
+
+Technically, the older dispatcher has adapter and complexity-based model routing. In the native setup, each named OpenClaw agent has its own model configuration, while OpenClaw owns provider accounts and cooldowns. Research, planning, implementation, and review can use different models. The current native pilot uses Astra across those roles while I check the workflow itself; that is not a finding that every stage needs the most expensive model.
+
+### From prompt to running software
+
+Once dispatched, the prompt goes to a coding agent through a native OpenClaw session. The original path launched Codex directly; that remains a legacy fallback. The agent works in a dedicated Git worktree and branch on the server running OpenClaw, starting from `origin/<baseBranch>` so a dirty local development checkout does not become its starting point.
+
+Originally, a pull request was opened after implementation, and another review agent took a second pass, including waiting for additional PR comments. In the native workflow, implementation, host-run verification, and independent review are separate stages before the release stage opens the PR. GitHub CI then has to pass for the submitted head before merge.
+
+The coder commits and submits through `autocode_submit`; the separate reviewer records its assessment through `autocode_review`. Approval needs evidence against the acceptance criteria and no blocking findings. Higher-risk changes, such as permissions or migrations, also get a design-review stage before implementation.
+
+The idea is to avoid having the same agent write something, admire its own work, and immediately declare success. Of course, another agent agreeing with it is not proof that the code is correct either.
+
+Then comes the deliberately experimental part.
+
+In my setup, application changes that pass the gates are configured to merge automatically into `main`, followed by release and deployment. My local build-and-deploy pipeline builds the new version and rolls it out to my k3s environment. The native path adds a receipt tying that deployment to the exact merged commit and a representative application-workflow check. A healthy HTTP endpoint alone is not enough.
+
+Yes, I know. This is not the bit you copy straight into an enterprise production environment.
+
+These are hobby projects, and I’m deliberately accepting that things can break or that the wrong feature might get merged. That doesn’t mean there are no risks. It means I’m trying to find out what happens when the whole process runs without me being the person who approves every next step.
+
+There are still stopping points. Failed verification or review can trigger up to two repair handoffs against the preserved worktree; unresolved failures block progress. Framework changes have a separate human-review requirement. I want unattended application releases, but I don’t want “the agent said it was fine” to be the release check.
+
+And that has already exposed a fairly fundamental problem.
+
+## Ask an agent what to improve, and it will find something
+
+If your starting point is always “What can we improve?”, “What can we create?”, or “What can we fix?”, you will get plenty of answers.
+
+You will get tasks, pull requests, releases, and a very busy-looking system.
+
+You will also get features that probably should never have existed.
+
+Some of the work is there because there was a real problem. Some of it is there because I asked the system to find work, and it did exactly that.
+
+This is where it gets interesting, because a feature can be implemented correctly and still be a bad idea. A refactor can look sensible in isolation while adding very little value. An agent can make a perfectly convincing argument for a change that nobody needed.
+
+I started this partly because I didn’t want available capacity to go to waste. But creating unnecessary code is also waste—except now I have to maintain it.
+
+So yes, there is a slightly awkward contradiction in my original motivation.
+
+**I don’t want to waste the credits. I also don’t want a worse product just because I had credits left.**
+
+The next thing I want to explore further is how to give the system better judgement about whether work should happen at all. Some form of curation, prioritisation, and more demand-driven autonomous coding, instead of a loop that assumes there must always be another improvement waiting to be made.
+
+Ideally, an agent should be able to look at a project and say, “There isn’t anything here worth changing right now.”
+
+That might turn out to be harder than getting it to write another feature.
+
+The newer workflow has a first attempt at this. By default, it rotates up to three personas per discovery round, each proposing at most two alternatives. A separate planner can admit, defer, or select nothing. Completed investigations are skipped when the relevant code, goals, skill, and feedback are unchanged. Daily limits and backlog pressure also stop the system from endlessly filling its own queue.
+
+Those are useful controls, but they are not product judgement. Comparing differently worded versions of the same idea, or deciding that a missing feature should stay missing, still requires the model to make a sensible call.
+
+I haven’t solved it. I’ve started adding the logic, but whether it actually produces better decisions is still something I need to establish.
+
+## The demo is the easy part. What happens six months later?
+
+The thing that keeps me interested is what happens after the initial build.
+
+Getting an MVP together has become much easier in my own projects. Even a fairly impressive working demo is no longer the hurdle it used to be.
+
+But then life happens. Your attention moves elsewhere, another idea comes along, and the repository you were excited about half a year ago stops getting much love.
+
+Meanwhile, dependencies change, integrations evolve, security issues appear, and newer tools make your original implementation look a little less impressive.
+
+Who takes care of that?
+
+If we want enterprises to seriously consider replacing something like a Salesforce product with an AI-generated alternative, we need a much better answer than “look how quickly I built these screens.”
+
+The software needs to be maintained, updated, tested, and continuously secured. Someone—or some system—needs to understand whether a change is necessary, whether it broke an existing workflow, and whether it should be deployed.
+
+There is a lot of ownership hidden behind the phrase “working application.”
+
+That is the part I would like these frameworks to help with. I don’t just want an agent that can build something while I watch. I want to explore whether it can keep a project healthy when I’m not paying attention to it every evening.
+
+Obviously, the version of AutoCode I’m experimenting with today is not ready to take responsibility for an enterprise application. The auto-merge experiment alone should make that clear. There would need to be much stronger controls around permissions, validation, spending, rollback, and when a human needs to make the decision.
+
+But I think that ongoing maintenance problem is worth working on now, rather than assuming the next model release will somehow take care of it.
+
+## Can the agents do the thinking as well?
+
+We can have a long discussion about consciousness, whether neural networks are really reasoning, or whether this is incredibly sophisticated next-token prediction built from a distillation of our own knowledge, creativity, and perception of the world.
+
+I find that discussion interesting. I just don’t think I need to settle it to test whether this framework is useful.
+
+What I do need to know is whether the agents can recognise the difference between something that merely works and something that is actually good.
+
+Can they look at two interfaces and understand why one feels coherent while the other feels like five different design systems had an argument? Can they identify the feature your application is genuinely missing? Can they challenge the initial idea instead of enthusiastically implementing it?
+
+And can they do that without me constantly pointing them in the right direction?
+
+I don’t think it’s sensible to assume that being very good at coding automatically means being very good at product judgement.
+
+At the same time, no individual knowledge worker has deep expertise in every relevant field. I certainly don’t. Being able to have a project examined from multiple specialist perspectives is a big part of the attraction here.
+
+I might approach something as a cloud architect. A backend persona, a frontend persona, and an operations persona might each spot something I hadn’t considered.
+
+That doesn’t make their suggestions correct. But it could help produce better prompts and bring an idea to life from more angles than the ones I happened to think of myself.
+
+If the models keep advancing in the way we are being promised, I think we’ll need systems that can turn those capabilities into useful, ongoing work. Otherwise, we still end up with a very capable model waiting for a tired human to type the next instruction.
+
+Which brings me back to where this started.
+
+## If you want to try setting it up
+
+The code is at [Dikkekip/autocode](https://github.com/Dikkekip/autocode). The [getting-started guide](../getting-started.md) and [native reference](../native-autonomy.md) cover the longer version. This is the outline, because there are a few more moving parts than cloning a repo and telling an agent to get on with it.
+
+You need Git, pnpm 10.30.3, and a Node version supported by both the framework and your OpenClaw installation. The framework declares Node 22 or newer; OpenClaw may need something newer. The native compatibility checks for this pilot used OpenClaw 2026.9.1. You also need working model/provider access and GitHub access for the repository you intend to work on.
+
+Start by building the framework:
+
+```bash
+git clone https://github.com/Dikkekip/autocode.git
+cd autocode
+git checkout master
+pnpm install --frozen-lockfile
+pnpm build
+pnpm dispatcher native --help
+```
+
+Keep this checkout at a stable path. The plugin uses its built files.
+
+Then prepare a policy for your application. Replace the path and default branch with your own:
+
+```bash
+pnpm dispatcher native prepare \
+  --profile profiles/minimal-repo/profile.json \
+  --repository /absolute/path/to/application \
+  --base main \
+  --out /absolute/path/to/application/.openclaw/native.json
+```
+
+This creates a disabled policy. It does not register agents or start the coding loop. The minimal profile assumes a small pnpm project, so change the paths and verification commands for your stack. Existing dispatcher users can use their own `.openclaw/profile.json` as the input instead.
+
+The important bits to configure are:
+
+- A unique `boardId`, the application repository, and its base branch.
+- Your personas: goals, `allowedPaths`, success observations, weights, and any custom `ideationPrompt` instructions.
+- Registered research, planner, coder, and reviewer agent IDs, with the model you want each to use. The reviewer must be different from the coder.
+- `quality.skillPath`, pointing to the readable `skills/prompt-engineering-expert/SKILL.md`, and verification commands that actually exercise your application.
+- Deployment and independent workflow-check commands. Keep `workerConcurrency` at one while you find out whether your setup works.
+
+Register those agents through OpenClaw’s supported agent commands. Research roles get the inspection/proposal tools and native completion tools, without shell or editing access. The planner gets admission and deferral tools, the coder gets submission, and the reviewer gets review tools. All worker roles need `autocode_context` to retrieve the complete prompt. The native reference lists the exact tool permissions; this is one of the bits where copying a generic all-powerful agent configuration is likely to get in your way.
+
+Install the plugin from the stable checkout:
+
+```bash
+openclaw plugins install --link /absolute/path/to/autocode/plugins/autocode
+openclaw plugins enable workboard
+```
+
+In OpenClaw’s configuration, include `autocode` and `workboard` in `plugins.allow`, preserve your other plugins, and enable the autocode entry. Its configuration needs the project policy and the absolute path to your active OpenClaw executable:
+
+```json
+{
+  "projects": ["/absolute/path/to/application/.openclaw/native.json"],
+  "openclawCommand": "/absolute/path/to/openclaw"
+}
+```
+
+That object belongs under `plugins.entries.autocode.config`. Apply it using your installation’s supported configuration and plugin-consent flow, then reload the gateway. Leave the project disabled while finishing the setup.
+
+Deployment is the application-specific part. Your adapter receives `AUTOCODE_SHA`, `AUTOCODE_WORKFLOW_ID`, and `AUTOCODE_REPOSITORY`. It must deploy that exact merged commit. The independent check must verify the running revision and an actual application workflow, then return only this JSON shape on stdout:
+
+```json
+{"deployedSha":"<full merged commit SHA>","workflowPassed":true}
+```
+
+My adapter connects this to my existing K3s scripts. Yours does not need K3s, but it does need a real deployment command and a meaningful check. The framework cannot guess what “working” means for your application.
+
+Once that is configured, check readiness and install the scheduled jobs:
+
+```bash
+pnpm dispatcher native --policy /absolute/path/to/application/.openclaw/native.json doctor
+pnpm dispatcher native --policy /absolute/path/to/application/.openclaw/native.json install-automations \
+  --node /absolute/path/to/node \
+  --cli /absolute/path/to/autocode/apps/dispatcher-cli/dist/index.js
+```
+
+New jobs are disabled. After readiness passes, set the policy’s `enabled` field to `true`, reload the plugin, run `native --policy <file> resume`, and enable the returned jobs through OpenClaw. Those are separate steps: `resume` does not edit the policy or enable the jobs. Quality discovery runs hourly by default, with reconciliation every five minutes.
+
+If you are migrating an existing dispatcher installation, follow the migration section in the guide first. Do not give the legacy dispatcher and native Workboard simultaneous ownership of the same project.
+
+And these are the commands I would keep nearby:
+
+```bash
+pnpm dispatcher native --policy /absolute/path/to/application/.openclaw/native.json status
+pnpm dispatcher native --policy /absolute/path/to/application/.openclaw/native.json quality
+pnpm dispatcher native --policy /absolute/path/to/application/.openclaw/native.json pause
+```
+
+The quality report shows investigations, selection decisions, reviews, repairs, and verified deployments. `pause` stops new dispatch and promotion while preserving accepted sessions and evidence; it is not a kill switch for every running task.
+
+Before activation, run `pnpm run ci` and the installed-contract checks described in the guide. That checks the framework and its integration assumptions. It does not prove your first feature has made it safely into the running application.
+
+## Very alpha. Have a go.
+
+AutoCode is still an idea I’m building and playing with. It works in my environment well enough that I want to share it, but I’m genuinely curious whether someone else can get it going.
+
+To put a date on that: the September 6 native status check showed completed persona investigations and two admitted implementation workflows, but zero independent reviews and zero verified native deployments. That is progress through the early stages, not proof of a complete unattended release. Some setup documentation still describes the earlier paused pilot; the live status and quality reports are the better guide to what your installation is actually doing.
+
+There is also the slightly uncomfortable possibility that the agents have fixed things locally that aren’t actually captured in Git. Getting it running on someone else’s machine should be a good test of that.
+
+One concrete example is my installed deployment policy: it points to a host-specific release script outside this repository. The framework is in Git, but my complete server configuration is not a portable installation package. Your agent setup, provider credentials, and application deployment adapter still need configuring. I would rather say that now than pretend the clone command reproduces my server.
+
+So have a go on something disposable. Contribute, tell me what breaks, or tell me that the whole approach is overcomplicated and there is a much better way to do it.
+
+I’m particularly interested in whether it creates work that was genuinely worth doing. Producing more commits is easy to mistake for progress, especially when you didn’t have to write them yourself.
+
+Or just enjoy reading my take.
+
+I don’t think we’re there yet with fully autonomous coding. At least, I’m not at the point where I trust it to take over a product and leave me out of the process entirely.
+
+But I sure as hell want us to get closer, because my attention span, my job, parenting, and everything else going on in life are not going to leave me available to prompt all my coding projects, all the time.
+
+Some evenings I want to build something.
+
+Some evenings I want to close the laptop.
+
+I’d like my projects to survive both.
