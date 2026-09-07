@@ -6,8 +6,8 @@ description: "Experimenting with autonomous coding agents, OpenClaw, multiple AI
 categories: [AI, Autonomous Agents, Software Development, OpenClaw, DevOps, Cloud]
 tags: [AutoCode, AI Agents, Autonomous Coding, OpenClaw, GPT-6 Astra, Software Engineering, DevOps, LLMs]
 image:
-  path: /assets/img/autocode.png
-  src: /assets/img/autocode.png
+  path: /assets/img/AutoCode.png
+  src: /assets/img/AutoCode.png
 ---
 # AutoCode: I Have the Credits. I Don’t Always Have the Time.
 
